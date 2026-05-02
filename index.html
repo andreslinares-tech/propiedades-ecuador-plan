@@ -2058,30 +2058,104 @@ El canal Requerimiento existe porque hay leads con necesidades específicas que 
         <p class="text-sm text-zinc-400 italic ml-1">No aplica — Bot Requerimiento es terminal. Cierra su flujo en <code class="text-xs font-mono text-zinc-300">WF Lead Calificado Requerimiento</code> o <code class="text-xs font-mono text-zinc-300">WF Oportunidad Futura Requerimiento</code>. No deriva a otros bots.</p>
       </div>
 
-      <!-- ========== Knowledge Base — recordatorio ========== -->
+      <!-- ========== Knowledge Base — cargada y asignada ========== -->
       <div id="kb-pendiente" class="mb-8 pb-10 scroll-mt-12">
         <div class="flex items-center gap-3 mb-2">
           <div class="w-3 h-3 rounded-full bg-[#63B3ED]"></div>
-          <h3 class="text-2xl font-semibold tracking-tight">📚 Knowledge Base — pendiente de armar</h3>
+          <h3 class="text-2xl font-semibold tracking-tight">📚 Knowledge Base · PROPIEDADES ECUADOR</h3>
+          <span class="ml-2 px-2 py-1 text-[10px] font-mono uppercase tracking-wider rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">✓ cargada · asignada a los 5 bots</span>
         </div>
-        <p class="text-sm text-zinc-500 mb-6 ml-6">KB compartida que consultan los 5 bots. Falta poblarla con el contenido scrapeado de propiedadesecuador.net + presentación.</p>
+        <p class="text-sm text-zinc-500 mb-6 ml-6">KB compartida que consultan los 5 bots de Conversation AI V2. Combina <strong class="text-zinc-300">web crawler</strong> (auto-actualización del inventario y datos de la empresa) con <strong class="text-zinc-300">15 FAQs manuales</strong> de políticas internas.</p>
 
-        <div class="bg-zinc-950/50 border border-amber-400/20 rounded-xl p-6">
-          <p class="font-mono text-[10px] uppercase tracking-wider text-amber-400/70 mb-4">⚠ Pendiente</p>
-          <p class="text-sm text-zinc-300 mb-4">Cuando arme la KB, debe incluir como mínimo:</p>
-          <ul class="text-sm text-zinc-300 space-y-2 ml-5 list-disc mb-4">
-            <li><strong class="text-zinc-100">Identidad de la empresa</strong> — quiénes son, misión, slogan ("más que propiedades, confianza"), licencia, oficinas en Guayaquil + cobertura nacional.</li>
-            <li><strong class="text-zinc-100">Servicios que ofrecen</strong> — captación, venta, alquiler, asesoría, alianzas con corredores.</li>
-            <li><strong class="text-zinc-100">FAQs comunes</strong> — comisiones, plazos, garantías, qué documentos pide la captación, cómo funciona la exclusividad, cómo se coordinan visitas.</li>
-            <li><strong class="text-zinc-100">Política de exclusividad</strong> — por qué la prefieren, qué incluye (fotos profesionales, marketing, tour virtual), si aceptan abiertos.</li>
-            <li><strong class="text-zinc-100">Política de alianzas</strong> — contrato escrito obligatorio, comisión variable según licencia, beneficios mutuos.</li>
-            <li><strong class="text-zinc-100">Scripts de seguridad</strong> — qué responder si piden GPS antes de calificar, cómo derivar audios, cuándo aplicar lead_sospechoso.</li>
-            <li><strong class="text-zinc-100">Horarios de atención</strong> — cuándo Katerin/Emilio están disponibles para coordinar.</li>
-            <li><strong class="text-zinc-100">Links</strong> — portal Wasi (inventario), redes sociales (Instagram, Facebook, YouTube), pin de presentación.</li>
-            <li><strong class="text-zinc-100">Diferenciadores</strong> — qué hace distinta a Propiedades Ecuador de otras inmobiliarias (videos de presentación lo explican).</li>
-          </ul>
-          <p class="text-sm text-zinc-400 italic">Fuentes a scrapear: <code class="text-xs font-mono text-zinc-300">propiedadesecuador.net</code> + pin de presentación con redes y videos. Andrés ya tiene los URLs para extraer.</p>
+        <!-- Web Crawler -->
+        <p class="bot-section-label text-blue-300/70">1 · Web Crawler (reindex automático)</p>
+        <div class="bg-zinc-950/50 border border-blue-400/20 rounded-xl p-5 mb-6">
+          <p class="text-sm text-zinc-300 mb-3">GHL crawlea estas URLs automáticamente y mantiene el contenido actualizado. Cada vez que se publica una propiedad nueva en el portal, la KB la incorpora en el siguiente reindex.</p>
+          <div class="space-y-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-blue-300">🌐</span>
+              <code class="text-xs font-mono text-zinc-200">https://propiedadesecuador.net</code>
+              <span class="text-[10px] text-zinc-500">— web institucional + datos de empresa</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-blue-300">🌐</span>
+              <code class="text-xs font-mono text-zinc-200">https://propiedadesecuador.inmo.co</code>
+              <span class="text-[10px] text-zinc-500">— portal de inventario (~50 propiedades activas)</span>
+            </div>
+          </div>
+          <p class="text-xs text-zinc-500 italic">Reindex cada 7 días — captura cambios de inventario sin trabajo manual.</p>
         </div>
+
+        <!-- FAQs cargadas -->
+        <p class="bot-section-label text-blue-300/70">2 · FAQs manuales (15) — políticas internas que NO están en la web</p>
+        <div class="bg-zinc-950/50 border border-white/10 rounded-xl p-5">
+          <div class="grid md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <div class="space-y-2">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-1">🏢 Empresa</p>
+              <p class="text-zinc-300">1. ¿Quiénes son Propiedades Ecuador?</p>
+              <p class="text-zinc-300">2. ¿Atienden fuera de Guayaquil?</p>
+              <p class="text-zinc-300">14. ¿Tienen oficina física? ¿Cómo me contacto?</p>
+            </div>
+            <div class="space-y-2">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-1">🏠 Propiedades · servicios</p>
+              <p class="text-zinc-300">3. ¿Qué tipos de propiedad manejan?</p>
+              <p class="text-zinc-300">4. ¿Qué servicios ofrecen?</p>
+            </div>
+            <div class="space-y-2">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-1">📝 Captación · exclusividad</p>
+              <p class="text-zinc-300">5. ¿Cómo funciona la captación con exclusividad?</p>
+              <p class="text-zinc-300">9. ¿Pueden vender mi propiedad si tiene hipoteca o gravámenes?</p>
+              <p class="text-zinc-300">10. ¿Cuánto tarda en venderse una propiedad?</p>
+              <p class="text-zinc-300">12. ¿Cómo verifican que una propiedad esté en regla legalmente?</p>
+              <p class="text-zinc-300">13. ¿Hacen valuaciones de propiedades?</p>
+            </div>
+            <div class="space-y-2">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-1">💰 Pago · comisiones</p>
+              <p class="text-zinc-300">6. ¿Cuál es la comisión por venta de mi propiedad?</p>
+              <p class="text-zinc-300">8. ¿Aceptan crédito bancario? ¿Qué formas de pago manejan?</p>
+            </div>
+            <div class="space-y-2">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-1">🤝 Alianzas</p>
+              <p class="text-zinc-300">7. Soy corredor inmobiliario, ¿cómo trabajamos en alianza?</p>
+            </div>
+            <div class="space-y-2">
+              <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-1">🚪 Visitas · seguridad</p>
+              <p class="text-zinc-300">11. ¿Cómo se coordinan las visitas a las propiedades?</p>
+              <p class="text-zinc-300">15. ¿Por qué no comparten la dirección exacta antes de coordinar?</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Asignación a bots -->
+        <p class="bot-section-label text-blue-300/70">3 · Asignada a los 5 bots</p>
+        <div class="bg-zinc-950/50 border border-white/10 rounded-xl p-5">
+          <p class="text-sm text-zinc-300 mb-4">La misma KB está asignada a los 5 bots de Conversation AI V2. Todos los bots pueden consultar el inventario y las FAQs cuando responden a un lead.</p>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-2 h-2 rounded-full bg-[#8B6FD8]"></span>
+              <span class="text-zinc-300">Orquestador</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-2 h-2 rounded-full bg-[#3DA08F]"></span>
+              <span class="text-zinc-300">Compra</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-2 h-2 rounded-full bg-[#B05A48]"></span>
+              <span class="text-zinc-300">Captación</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-2 h-2 rounded-full bg-[#B89A45]"></span>
+              <span class="text-zinc-300">Alianza</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="w-2 h-2 rounded-full bg-[#B05A8E]"></span>
+              <span class="text-zinc-300">Requerimiento</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Source -->
+        <p class="text-xs text-zinc-500 italic mt-4 ml-1">Source de las FAQs y bloques temáticos: <code class="text-[11px] font-mono text-zinc-400">SETUP proceso comercial/05-knowledge-base/knowledge-base.md</code></p>
       </div>
 
     </section>
