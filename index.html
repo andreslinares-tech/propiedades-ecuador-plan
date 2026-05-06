@@ -638,163 +638,186 @@
     <section id="bots" class="mb-24 scroll-mt-12">
       <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500 mb-3">04 · Bots</p>
       <h2 class="text-3xl md:text-4xl font-semibold tracking-tight mb-3">Arquitectura de bots — Conversation AI V2</h2>
-      <p class="serif-italic text-zinc-400 mb-8 max-w-3xl">5 bots conectados (1 orquestador + 4 especialistas) con KB compartida y handoff humano por canal.</p>
+      <p class="serif-italic text-zinc-400 mb-8 max-w-3xl">Dos sistemas paralelos: <strong class="text-zinc-300">Sistema Orquestador</strong> (lead orgánico → Captación · Alianza · Requerimiento) y <strong class="text-zinc-300">Bot Compra independiente</strong> (lead de campañas Meta Ads → Emilio). KB compartida por todos.</p>
 
       <div class="diagram-card">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 874" width="100%" role="img">
-          <text x="540" y="22" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="14" fill="#9CA3AF">5 bots conectados (1 orquestador + 4 especialistas) con KB compartida y handoff humano por canal.</text>
-          <text x="540" y="58" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-weight="600" font-size="15" fill="#E5E7EB">Arquitectura de bots — Conversation AI V2</text>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 920" width="100%" role="img">
+          <text x="550" y="22" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="14" fill="#9CA3AF">2 caminos paralelos: orquestador (3 bots) + bot compra (independiente desde campañas).</text>
+          <text x="550" y="58" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-weight="600" font-size="15" fill="#E5E7EB">Arquitectura de bots — Conversation AI V2 (v3.0)</text>
+
+          <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+          <!-- SECCIÓN A · SISTEMA ORQUESTADOR — lado izquierdo (x: 0 a 770)                  -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+          <text x="385" y="76" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="2" fill="#8B6FD8">SISTEMA ORQUESTADOR · LEAD ORGÁNICO</text>
+
           <!-- Mensaje entrante -->
-          <rect x="430" y="80" width="220" height="44" rx="10" fill="#2D3748" stroke="#4A5568" stroke-width="1.2"/>
-          <text x="540" y="107" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#E5E7EB">Mensaje entrante</text>
-          <line x1="540" y1="124" x2="540" y2="142" stroke="#4A5568" stroke-width="1.2"/>
-          <!-- Bienvenida -->
-          <rect x="380" y="142" width="320" height="48" rx="10" fill="#3D4452" stroke="#5A6478" stroke-width="1.2"/>
-          <text x="540" y="172" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#E5E7EB">Mensaje de bienvenida del canal</text>
-          <line x1="540" y1="190" x2="540" y2="208" stroke="#4A5568" stroke-width="1.2"/>
+          <rect x="275" y="86" width="220" height="40" rx="10" fill="#2D3748" stroke="#4A5568" stroke-width="1.2"/>
+          <text x="385" y="111" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#E5E7EB">Mensaje entrante (orgánico)</text>
+          <line x1="385" y1="126" x2="385" y2="144" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- Bienvenida del workflow -->
+          <rect x="225" y="144" width="320" height="48" rx="10" fill="#3D4452" stroke="#5A6478" stroke-width="1.2"/>
+          <text x="385" y="166" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="12" fill="#E5E7EB">Workflow INICIO BOT - ORQUESTADOR</text>
+          <text x="385" y="182" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#A0AEC0">tag "bot" + saludo (4 opciones) + Wait + Activate Bot</text>
+          <line x1="385" y1="192" x2="385" y2="210" stroke="#4A5568" stroke-width="1.2"/>
+
           <!-- Bot Orquestador -->
-          <rect x="330" y="208" width="420" height="76" rx="14" fill="#5B3FA8" stroke="#8B6FD8" stroke-width="1.2"/>
-          <text x="540" y="233" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="16" fill="#FFFFFF">BOT ORQUESTADOR</text>
-          <text x="540" y="251" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#9B7FC7">FILTRO</text>
-          <text x="540" y="270" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#D6BCFA">"¿Qué te trae por aquí?" — detecta intención libre → tag canal</text>
-          <!-- Branch -->
-          <line x1="540" y1="284" x2="540" y2="304" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="162" y1="304" x2="918" y2="304" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="162" y1="304" x2="162" y2="324" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="414" y1="304" x2="414" y2="324" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="666" y1="304" x2="666" y2="324" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="918" y1="304" x2="918" y2="324" stroke="#4A5568" stroke-width="1.2"/>
-          <text x="162" y="318" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">tag comprador</text>
-          <text x="414" y="318" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">tag captación</text>
-          <text x="666" y="318" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">tag alianza</text>
-          <text x="918" y="318" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">tag requerimiento</text>
-          <!-- BOT COMPRA (height=220) -->
-          <rect x="42" y="324" width="240" height="220" rx="12" fill="#1F4E47" stroke="#2D8074" stroke-width="1.2"/>
-          <text x="162" y="346" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#E2F4F0">BOT COMPRA</text>
-          <text x="162" y="361" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#2D8074">FILTRO</text>
-          <!-- Burbuja Q1 -->
-          <rect x="55" y="370" width="214" height="20" rx="10" fill="#2A6359" stroke="#3DA08F" stroke-width="0.8"/>
-          <text x="162" y="384" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#C4E8DD">1. ¿Interesa esta propiedad?</text>
-          <!-- Burbuja Q2 -->
-          <rect x="55" y="393" width="214" height="20" rx="10" fill="#2A6359" stroke="#3DA08F" stroke-width="0.8"/>
-          <text x="162" y="407" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#C4E8DD">2. ¿Coordinamos visita?</text>
-          <!-- Transfer note -->
-          <text x="162" y="431" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#7DB5A8">si NO interesa → 🔀 Requerimiento</text>
-          <!-- Separator -->
-          <line x1="60" y1="486" x2="264" y2="486" stroke="#2D8074" stroke-width="0.6" stroke-opacity="0.5"/>
-          <text x="162" y="502" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#E2F4F0">✓ lead_calificado → Emilio</text>
-          <text x="162" y="518" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#4A8A7A">✗ no visita → Op. Futura</text>
-          <text x="162" y="534" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#4A8A7A">✗ GPS/audio → lead_sospechoso</text>
+          <rect x="175" y="210" width="420" height="76" rx="14" fill="#5B3FA8" stroke="#8B6FD8" stroke-width="1.2"/>
+          <text x="385" y="235" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="16" fill="#FFFFFF">BOT ORQUESTADOR</text>
+          <text x="385" y="253" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#9B7FC7">CLASIFICA · BOT TRANSFER ATÓMICO · SIN TAGS</text>
+          <text x="385" y="272" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#D6BCFA">Recibe respuesta del lead → 1 de 3 Bot Transfers</text>
 
-          <!-- BOT CAPTACIÓN (height=220) -->
-          <rect x="294" y="324" width="240" height="220" rx="12" fill="#5A2A21" stroke="#A04A38" stroke-width="1.2"/>
-          <text x="414" y="346" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#F5DCD2">BOT CAPTACIÓN</text>
-          <text x="414" y="361" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#A04A38">FILTRO</text>
-          <!-- Burbuja Q1 -->
-          <rect x="307" y="370" width="214" height="20" rx="10" fill="#6B3A30" stroke="#B05A48" stroke-width="0.8"/>
-          <text x="414" y="384" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#F0C4B5">1. ¿Eres propietario directo?</text>
-          <!-- Burbuja Q2 -->
-          <rect x="307" y="393" width="214" height="20" rx="10" fill="#6B3A30" stroke="#B05A48" stroke-width="0.8"/>
-          <text x="414" y="407" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#F0C4B5">2. ¿Estado legal / sin deudas?</text>
-          <!-- Burbuja Q3 -->
-          <rect x="307" y="416" width="214" height="20" rx="10" fill="#6B3A30" stroke="#B05A48" stroke-width="0.8"/>
-          <text x="414" y="430" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#F0C4B5">3. ¿Otra inmobiliaria la publica?</text>
-          <!-- Transfer note -->
-          <text x="414" y="455" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#A87A6A">si "soy corredor" → 🔀 Bot Alianza</text>
-          <!-- Separator -->
-          <line x1="312" y1="486" x2="516" y2="486" stroke="#A04A38" stroke-width="0.6" stroke-opacity="0.5"/>
-          <text x="414" y="502" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#F5DCD2">✓ lead_calificado → Katerin</text>
-          <text x="414" y="518" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A5A4A">✗ Oportunidad Futura</text>
-          <text x="414" y="534" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A5A4A">✗ GPS/audio → lead_sospechoso</text>
+          <!-- Branch 3 ramas -->
+          <line x1="385" y1="286" x2="385" y2="306" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="125" y1="306" x2="645" y2="306" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="125" y1="306" x2="125" y2="326" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="385" y1="306" x2="385" y2="326" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="645" y1="306" x2="645" y2="326" stroke="#4A5568" stroke-width="1.2"/>
+          <text x="125" y="320" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">→ Captación</text>
+          <text x="385" y="320" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">→ Alianza</text>
+          <text x="645" y="320" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="1" fill="#9CA3AF">→ Requerimiento</text>
 
-          <!-- BOT ALIANZA (height=220) -->
-          <rect x="546" y="324" width="240" height="220" rx="12" fill="#5C4A1C" stroke="#A88835" stroke-width="1.2"/>
-          <text x="666" y="346" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#F5E5C2">BOT ALIANZA</text>
-          <text x="666" y="361" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#A88835">FILTRO</text>
-          <!-- Burbuja Q1 -->
-          <rect x="559" y="370" width="214" height="20" rx="10" fill="#6E5C24" stroke="#B89A45" stroke-width="0.8"/>
-          <text x="666" y="384" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#E8D49C">1. Inmobiliaria + tipo + zona</text>
-          <!-- Burbuja Q2 -->
-          <rect x="559" y="393" width="214" height="20" rx="10" fill="#6E5C24" stroke="#B89A45" stroke-width="0.8"/>
-          <text x="666" y="407" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#E8D49C">2. ¿Acepta contrato escrito?</text>
-          <!-- Burbuja Q3 -->
-          <rect x="559" y="416" width="214" height="20" rx="10" fill="#6E5C24" stroke="#B89A45" stroke-width="0.8"/>
-          <text x="666" y="430" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#E8D49C">3. ¿Tiene licencia profesional?</text>
-          <!-- Note -->
-          <text x="666" y="455" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#A8945A">Q3 no bloquea — define % comisión</text>
-          <!-- Separator -->
-          <line x1="564" y1="486" x2="768" y2="486" stroke="#A88835" stroke-width="0.6" stroke-opacity="0.5"/>
-          <text x="666" y="502" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#F5E5C2">✓ lead_calificado → Katerin</text>
-          <text x="666" y="518" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A7A4A">✗ solo verbal → Op. Futura</text>
-          <text x="666" y="534" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A7A4A">✗ GPS/audio → lead_sospechoso</text>
+          <!-- BOT CAPTACIÓN (centerX=125) -->
+          <rect x="5" y="326" width="240" height="220" rx="12" fill="#5A2A21" stroke="#A04A38" stroke-width="1.2"/>
+          <text x="125" y="348" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#F5DCD2">BOT CAPTACIÓN</text>
+          <text x="125" y="363" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#A04A38">FILTRO</text>
+          <rect x="18" y="372" width="214" height="20" rx="10" fill="#6B3A30" stroke="#B05A48" stroke-width="0.8"/>
+          <text x="125" y="386" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#F0C4B5">1. ¿Eres propietario directo?</text>
+          <rect x="18" y="395" width="214" height="20" rx="10" fill="#6B3A30" stroke="#B05A48" stroke-width="0.8"/>
+          <text x="125" y="409" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#F0C4B5">2. ¿Estado legal / sin deudas?</text>
+          <rect x="18" y="418" width="214" height="20" rx="10" fill="#6B3A30" stroke="#B05A48" stroke-width="0.8"/>
+          <text x="125" y="432" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#F0C4B5">3. ¿Otra inmobiliaria la publica?</text>
+          <text x="125" y="457" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#A87A6A">si "soy corredor" → 🔀 Bot Alianza</text>
+          <line x1="23" y1="488" x2="227" y2="488" stroke="#A04A38" stroke-width="0.6" stroke-opacity="0.5"/>
+          <text x="125" y="504" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#F5DCD2">✓ lead_calificado → Katerin</text>
+          <text x="125" y="520" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A5A4A">✗ Oportunidad Futura</text>
+          <text x="125" y="536" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A5A4A">✗ GPS/audio → humano</text>
 
-          <!-- BOT REQUERIMIENTO (height=220) -->
-          <rect x="798" y="324" width="240" height="220" rx="12" fill="#5A2A47" stroke="#9F4A7E" stroke-width="1.2"/>
-          <text x="918" y="346" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#F5D8E8">BOT REQUERIMIENTO</text>
-          <text x="918" y="361" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#9F4A7E">FILTRO · BRIEFING</text>
-          <!-- Burbuja Q1 -->
-          <rect x="811" y="370" width="214" height="20" rx="10" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
-          <text x="918" y="384" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">1. Tipo de propiedad</text>
-          <!-- Burbuja Q2 -->
-          <rect x="811" y="393" width="214" height="20" rx="10" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
-          <text x="918" y="407" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">2. Habitaciones (si vivienda)</text>
-          <!-- Burbuja Q3 -->
-          <rect x="811" y="416" width="214" height="20" rx="10" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
-          <text x="918" y="430" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">3. Zona / sector</text>
-          <!-- Burbuja Q4 -->
-          <rect x="811" y="439" width="214" height="20" rx="10" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
-          <text x="918" y="453" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">4. Presupuesto</text>
-          <!-- Burbuja Q5 -->
-          <rect x="811" y="462" width="214" height="20" rx="10" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
-          <text x="918" y="476" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">5. ¿Inversión o uso propio?</text>
-          <!-- Separator -->
-          <line x1="816" y1="486" x2="1020" y2="486" stroke="#9F4A7E" stroke-width="0.6" stroke-opacity="0.5"/>
-          <text x="918" y="502" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#F5D8E8">✓ lead_calificado → Katerin</text>
-          <text x="918" y="518" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A4A6A">✗ briefing incompleto → Op. Futura</text>
-          <text x="918" y="534" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A4A6A">✗ GPS/audio → lead_sospechoso</text>
-          <!-- Knowledge Base (shifted +34: y=530→564) -->
-          <rect x="380" y="564" width="320" height="56" rx="12" fill="#2C5282" stroke="#63B3ED" stroke-width="1.2"/>
-          <text x="540" y="590" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#FFFFFF">📚 KNOWLEDGE BASE</text>
-          <text x="540" y="608" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#BEE3F8">Horarios · oficinas · exclusividad · FAQs · link Wasi</text>
-          <line x1="162" y1="544" x2="162" y2="564" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="162" y1="564" x2="380" y2="592" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="414" y1="544" x2="414" y2="592" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="540" y1="544" x2="540" y2="564" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="666" y1="544" x2="666" y2="592" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="918" y1="544" x2="918" y2="564" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <line x1="918" y1="564" x2="700" y2="592" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
-          <text x="540" y="640" text-anchor="middle" font-family="-apple-system,sans-serif" font-style="italic" font-size="10" fill="#718096">los 4 bots consultan la KB compartida</text>
-          <!-- Solid verticals to Stop Bot (shifted +34: y=510→544, y=624→658) -->
-          <line x1="162" y1="544" x2="162" y2="658" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="414" y1="544" x2="414" y2="658" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="666" y1="544" x2="666" y2="658" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="918" y1="544" x2="918" y2="658" stroke="#4A5568" stroke-width="1.2"/>
-          <!-- Stop Bot triggers (shifted +34: y=624→658) -->
-          <rect x="100" y="658" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
-          <text x="162" y="683" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
-          <rect x="352" y="658" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
-          <text x="414" y="683" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
-          <rect x="604" y="658" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
-          <text x="666" y="683" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
-          <rect x="856" y="658" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
-          <text x="918" y="683" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
-          <!-- Connectors to circles (shifted +34) -->
-          <line x1="162" y1="698" x2="162" y2="730" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="414" y1="698" x2="414" y2="724" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="666" y1="698" x2="666" y2="724" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="918" y1="698" x2="918" y2="724" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="414" y1="724" x2="918" y2="724" stroke="#4A5568" stroke-width="1.2"/>
-          <line x1="666" y1="724" x2="666" y2="730" stroke="#4A5568" stroke-width="1.2"/>
-          <!-- Emilio (cy=740→774) -->
-          <circle cx="162" cy="774" r="44" fill="#1E3A5F" stroke="#2D5A8E" stroke-width="2"/>
-          <text x="162" y="771" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="14" fill="#D6E4F4">Emilio</text>
-          <text x="162" y="789" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#9CB6D6">closer</text>
-          <!-- Katerin (cy=740→774) -->
-          <circle cx="666" cy="774" r="44" fill="#1E3A5F" stroke="#2D5A8E" stroke-width="2"/>
-          <text x="666" y="771" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="14" fill="#D6E4F4">Katerin</text>
-          <text x="666" y="789" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#9CB6D6">3 canales</text>
-          <!-- Footer (y=810→844) -->
-          <text x="540" y="844" text-anchor="middle" font-family="-apple-system,sans-serif" font-style="italic" font-size="11" fill="#718096">Stop Bot Triggers diferenciados: cada bot notifica con template propio · GHL V2 cobra por bot activo (validar plan)</text>
+          <!-- BOT ALIANZA (centerX=385) -->
+          <rect x="265" y="326" width="240" height="220" rx="12" fill="#5C4A1C" stroke="#A88835" stroke-width="1.2"/>
+          <text x="385" y="348" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#F5E5C2">BOT ALIANZA</text>
+          <text x="385" y="363" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#A88835">FILTRO</text>
+          <rect x="278" y="372" width="214" height="20" rx="10" fill="#6E5C24" stroke="#B89A45" stroke-width="0.8"/>
+          <text x="385" y="386" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#E8D49C">1. Inmobiliaria + tipo + zona</text>
+          <rect x="278" y="395" width="214" height="20" rx="10" fill="#6E5C24" stroke="#B89A45" stroke-width="0.8"/>
+          <text x="385" y="409" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#E8D49C">2. ¿Acepta contrato escrito?</text>
+          <rect x="278" y="418" width="214" height="20" rx="10" fill="#6E5C24" stroke="#B89A45" stroke-width="0.8"/>
+          <text x="385" y="432" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#E8D49C">3. ¿Tiene licencia profesional?</text>
+          <text x="385" y="457" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#A8945A">Q3 no bloquea — define % comisión</text>
+          <line x1="283" y1="488" x2="487" y2="488" stroke="#A88835" stroke-width="0.6" stroke-opacity="0.5"/>
+          <text x="385" y="504" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#F5E5C2">✓ lead_calificado → Katerin</text>
+          <text x="385" y="520" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A7A4A">✗ solo verbal → Op. Futura</text>
+          <text x="385" y="536" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A7A4A">✗ GPS/audio → humano</text>
+
+          <!-- BOT REQUERIMIENTO (centerX=645) -->
+          <rect x="525" y="326" width="240" height="220" rx="12" fill="#5A2A47" stroke="#9F4A7E" stroke-width="1.2"/>
+          <text x="645" y="348" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#F5D8E8">BOT REQUERIMIENTO</text>
+          <text x="645" y="363" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#9F4A7E">FILTRO · BRIEFING (también recibe COMPRAR/INVERTIR)</text>
+          <rect x="538" y="372" width="214" height="18" rx="9" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
+          <text x="645" y="385" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">1. Tipo de propiedad</text>
+          <rect x="538" y="392" width="214" height="18" rx="9" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
+          <text x="645" y="405" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">2. Habitaciones (si vivienda)</text>
+          <rect x="538" y="412" width="214" height="18" rx="9" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
+          <text x="645" y="425" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">3. Zona / sector</text>
+          <rect x="538" y="432" width="214" height="18" rx="9" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
+          <text x="645" y="445" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">4. Presupuesto</text>
+          <rect x="538" y="452" width="214" height="18" rx="9" fill="#6B3A58" stroke="#B05A8E" stroke-width="0.8"/>
+          <text x="645" y="465" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#ECC0DC">5. ¿Inversión o uso propio?</text>
+          <line x1="543" y1="488" x2="747" y2="488" stroke="#9F4A7E" stroke-width="0.6" stroke-opacity="0.5"/>
+          <text x="645" y="504" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#F5D8E8">✓ lead_calificado → Katerin</text>
+          <text x="645" y="520" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A4A6A">✗ briefing incompleto → Op. Futura</text>
+          <text x="645" y="536" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#8A4A6A">✗ GPS/audio → humano</text>
+
+          <!-- Knowledge Base (compartida lado A) -->
+          <rect x="225" y="566" width="320" height="56" rx="12" fill="#2C5282" stroke="#63B3ED" stroke-width="1.2"/>
+          <text x="385" y="592" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#FFFFFF">📚 KNOWLEDGE BASE</text>
+          <text x="385" y="610" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#BEE3F8">Horarios · oficinas · exclusividad · FAQs · link Wasi</text>
+          <line x1="125" y1="546" x2="125" y2="566" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="125" y1="566" x2="225" y2="594" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="385" y1="546" x2="385" y2="566" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="645" y1="546" x2="645" y2="566" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="645" y1="566" x2="545" y2="594" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="385" y="642" text-anchor="middle" font-family="-apple-system,sans-serif" font-style="italic" font-size="10" fill="#718096">los 3 bots del orquestador + Bot Compra consultan la KB compartida</text>
+
+          <!-- Solid verticals to Stop Bot -->
+          <line x1="125" y1="546" x2="125" y2="660" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="385" y1="546" x2="385" y2="660" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="645" y1="546" x2="645" y2="660" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- Stop Bot triggers (3) -->
+          <rect x="63" y="660" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
+          <text x="125" y="685" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
+          <rect x="323" y="660" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
+          <text x="385" y="685" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
+          <rect x="583" y="660" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
+          <text x="645" y="685" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
+
+          <!-- Connectors to Katerin -->
+          <line x1="125" y1="700" x2="125" y2="730" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="385" y1="700" x2="385" y2="726" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="645" y1="700" x2="645" y2="730" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="125" y1="730" x2="645" y2="730" stroke="#4A5568" stroke-width="1.2"/>
+          <line x1="385" y1="730" x2="385" y2="736" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- Katerin -->
+          <circle cx="385" cy="780" r="44" fill="#1E3A5F" stroke="#2D5A8E" stroke-width="2"/>
+          <text x="385" y="777" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="14" fill="#D6E4F4">Katerin</text>
+          <text x="385" y="795" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#9CB6D6">3 canales</text>
+
+          <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+          <!-- DIVIDER vertical entre las 2 secciones (x=790)                                  -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+          <line x1="790" y1="80" x2="790" y2="860" stroke="#4A5568" stroke-width="1" stroke-dasharray="6,4" stroke-opacity="0.6"/>
+
+          <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+          <!-- SECCIÓN B · BOT COMPRA INDEPENDIENTE — lado derecho (x: 800 a 1080)             -->
+          <!-- ═══════════════════════════════════════════════════════════════════════════════ -->
+          <text x="940" y="76" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" letter-spacing="2" fill="#3DA08F">CAMINO PARALELO · LEAD DE CAMPAÑA</text>
+
+          <!-- Lead de campaña Meta Ads -->
+          <rect x="820" y="86" width="240" height="40" rx="10" fill="#2D3748" stroke="#4A5568" stroke-width="1.2"/>
+          <text x="940" y="105" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="12" fill="#E5E7EB">Lead campaña Meta Ads</text>
+          <text x="940" y="119" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#A0AEC0">con frase trigger específica</text>
+          <line x1="940" y1="126" x2="940" y2="144" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- Workflow CAMPAÑA -->
+          <rect x="820" y="144" width="240" height="48" rx="10" fill="#3D4452" stroke="#5A6478" stroke-width="1.2"/>
+          <text x="940" y="166" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="12" fill="#E5E7EB">Workflow CAMPAÑA - BOT</text>
+          <text x="940" y="182" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#A0AEC0">tag "bot" + bienvenida + Activate Bot Compra</text>
+          <line x1="940" y1="192" x2="940" y2="210" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- BOT COMPRA -->
+          <rect x="820" y="210" width="240" height="220" rx="12" fill="#1F4E47" stroke="#2D8074" stroke-width="1.2"/>
+          <text x="940" y="232" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="13" fill="#E2F4F0">BOT COMPRA</text>
+          <text x="940" y="247" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#2D8074">FILTRO · independiente del orquestador</text>
+          <rect x="833" y="258" width="214" height="20" rx="10" fill="#2A6359" stroke="#3DA08F" stroke-width="0.8"/>
+          <text x="940" y="272" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#C4E8DD">1. ¿Interesa esta propiedad?</text>
+          <rect x="833" y="281" width="214" height="20" rx="10" fill="#2A6359" stroke="#3DA08F" stroke-width="0.8"/>
+          <text x="940" y="295" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#C4E8DD">2. ¿Coordinamos visita?</text>
+          <text x="940" y="322" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" font-style="italic" fill="#7DB5A8">si NO interesa → cross-bot Requerimiento</text>
+          <line x1="838" y1="370" x2="1042" y2="370" stroke="#2D8074" stroke-width="0.6" stroke-opacity="0.5"/>
+          <text x="940" y="386" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#E2F4F0">✓ lead_calificado → Emilio</text>
+          <text x="940" y="402" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#4A8A7A">✗ no visita → Op. Futura</text>
+          <text x="940" y="418" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#4A8A7A">✗ GPS/audio → humano</text>
+
+          <!-- KB dashed line desde Bot Compra hacia KB del lado A -->
+          <line x1="820" y1="320" x2="545" y2="594" stroke="#63B3ED" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.7"/>
+
+          <!-- Connector to Stop Bot -->
+          <line x1="940" y1="430" x2="940" y2="500" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- Stop Bot Bot Compra -->
+          <rect x="878" y="500" width="124" height="40" rx="20" fill="#4A3522" stroke="#ED8936" stroke-width="1.2"/>
+          <text x="940" y="525" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="11" fill="#FBD38D">Stop Bot Trigger</text>
+          <line x1="940" y1="540" x2="940" y2="736" stroke="#4A5568" stroke-width="1.2"/>
+
+          <!-- Emilio -->
+          <circle cx="940" cy="780" r="44" fill="#1E3A5F" stroke="#2D5A8E" stroke-width="2"/>
+          <text x="940" y="777" text-anchor="middle" font-family="-apple-system,sans-serif" font-weight="600" font-size="14" fill="#D6E4F4">Emilio</text>
+          <text x="940" y="795" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" fill="#9CB6D6">closer</text>
+
+          <!-- Footer -->
+          <text x="550" y="888" text-anchor="middle" font-family="-apple-system,sans-serif" font-style="italic" font-size="11" fill="#718096">2 entry points (orgánico vs campaña), KB compartida, handoff a Katerin (3 canales) o Emilio (compradores) · v3.0 sin tags</text>
         </svg>
       </div>
 
