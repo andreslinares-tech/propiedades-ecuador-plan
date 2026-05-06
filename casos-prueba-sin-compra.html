@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Casos de prueba · 3 bots Propiedades Ecuador (sin Compra)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Geist', system-ui, sans-serif; font-feature-settings: 'cv11', 'ss01'; }
+    .font-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+    .serif-italic { font-family: 'Source Serif 4', Georgia, serif; font-style: italic; }
+    html { scroll-behavior: smooth; }
+    .grain::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.012; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .case-card {
+      background: rgba(9, 9, 11, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 28px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .case-card::before {
+      content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+      transition: width 0.25s ease;
+    }
+    .case-card[data-status="passed"] { border-color: rgba(74, 222, 128, 0.3); }
+    .case-card[data-status="passed"]::before { background: rgb(74, 222, 128); width: 6px; }
+    .case-card[data-status="failed"] { border-color: rgba(248, 113, 113, 0.3); }
+    .case-card[data-status="failed"]::before { background: rgb(248, 113, 113); width: 6px; }
+
+    .case-card[data-bot="captacion"]::before { background: #B05A48; }
+    .case-card[data-bot="alianza"]::before { background: #B89A45; }
+    .case-card[data-bot="requerimiento"]::before { background: #B05A8E; }
+    .case-card[data-bot="edge"]::before { background: #ED8936; }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.04em; }
+    .badge-captacion { background: rgba(160, 74, 56, 0.18); color: #F5BFA8; border: 1px solid rgba(176, 90, 72, 0.35); }
+    .badge-alianza { background: rgba(168, 136, 53, 0.18); color: #F5DC8C; border: 1px solid rgba(184, 154, 69, 0.35); }
+    .badge-requerimiento { background: rgba(159, 74, 126, 0.18); color: #F0B5DA; border: 1px solid rgba(176, 90, 142, 0.35); }
+    .badge-edge { background: rgba(237, 137, 54, 0.18); color: #FBD38D; border: 1px solid rgba(237, 137, 54, 0.35); }
+    .badge-ok { background: rgba(74, 222, 128, 0.15); color: #86EFAC; border: 1px solid rgba(74, 222, 128, 0.3); }
+    .badge-fail { background: rgba(248, 113, 113, 0.15); color: #FCA5A5; border: 1px solid rgba(248, 113, 113, 0.3); }
+    .badge-neutral { background: rgba(113, 113, 122, 0.18); color: #D4D4D8; border: 1px solid rgba(113, 113, 122, 0.3); }
+
+    .turn-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+    .turn-table th { text-align: left; padding: 10px 14px; font-family: 'Geist Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #71717A; border-bottom: 1px solid rgba(255,255,255,0.06); font-weight: 500; }
+    .turn-table td { padding: 12px 14px; vertical-align: top; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .turn-table tr:last-child td { border-bottom: none; }
+    .turn-table .turn-num { font-family: 'Geist Mono', monospace; font-size: 11px; color: #71717A; width: 36px; }
+    .turn-table .actor-bot { color: #A78BFA; font-weight: 500; font-size: 12px; }
+    .turn-table .actor-bot[data-bot="captacion"] { color: #F5BFA8; }
+    .turn-table .actor-bot[data-bot="alianza"] { color: #F5DC8C; }
+    .turn-table .actor-bot[data-bot="requerimiento"] { color: #F0B5DA; }
+    .turn-table .actor-lead { color: #FBD38D; font-weight: 500; font-size: 12px; }
+    .turn-table .actor-system { color: #94A3B8; font-style: italic; font-size: 12px; }
+    .turn-table .msg-lead { color: #FCD9A0; font-weight: 500; }
+    .turn-table .msg-system { color: #71717A; font-style: italic; font-size: 12px; }
+    .turn-table .msg-bot { color: #E4E4E7; }
+    .turn-table .turn-row-new { background: rgba(139, 92, 246, 0.05); }
+    .turn-table .new-tag { display: inline-block; font-family: 'Geist Mono', monospace; font-size: 9px; background: rgba(139, 92, 246, 0.2); color: #C4B5FD; padding: 1px 6px; border-radius: 4px; margin-right: 6px; vertical-align: middle; }
+
+    .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 8px; transition: background 0.15s; cursor: pointer; }
+    .check-item:hover { background: rgba(255,255,255,0.02); }
+    .check-item input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 1.5px solid rgba(255,255,255,0.2); border-radius: 5px; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: all 0.15s; position: relative; background: rgba(0,0,0,0.2); }
+    .check-item input[type="checkbox"]:hover { border-color: rgba(255,255,255,0.4); }
+    .check-item input[type="checkbox"]:checked { background: #4ADE80; border-color: #4ADE80; }
+    .check-item input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #052E16; font-size: 12px; font-weight: 700; line-height: 1; }
+    .check-item input[type="checkbox"]:checked + .check-label { color: #71717A; text-decoration: line-through; text-decoration-color: rgba(74, 222, 128, 0.5); }
+    .check-label { color: #D4D4D8; font-size: 13px; line-height: 1.55; transition: color 0.15s; }
+
+    .case-actions { display: flex; gap: 8px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .btn { font-family: 'Geist', sans-serif; font-size: 12px; padding: 8px 14px; border-radius: 8px; border: 1px solid; cursor: pointer; transition: all 0.15s; font-weight: 500; }
+    .btn-pass { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.3); color: #86EFAC; }
+    .btn-pass:hover { background: rgba(74, 222, 128, 0.2); border-color: rgba(74, 222, 128, 0.5); }
+    .btn-fail { background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.3); color: #FCA5A5; }
+    .btn-fail:hover { background: rgba(248, 113, 113, 0.2); border-color: rgba(248, 113, 113, 0.5); }
+    .btn-reset { background: transparent; border-color: rgba(255,255,255,0.1); color: #A1A1AA; }
+    .btn-reset:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.2); color: #E4E4E7; }
+    .btn-primary { background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.4); color: #C4B5FD; }
+    .btn-primary:hover { background: rgba(139, 92, 246, 0.25); border-color: rgba(139, 92, 246, 0.6); }
+
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+    .status-pending { background: rgba(113, 113, 122, 0.2); color: #A1A1AA; }
+    .status-passed { background: rgba(74, 222, 128, 0.18); color: #86EFAC; }
+    .status-failed { background: rgba(248, 113, 113, 0.18); color: #FCA5A5; }
+
+    .note-lateral { background: rgba(99, 102, 241, 0.06); border-left: 3px solid rgba(139, 92, 246, 0.5); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 16px; font-size: 13px; color: #C7D2FE; }
+    .note-lateral strong { color: #DDD6FE; }
+
+    .bug-row { display: grid; grid-template-columns: 60px 1fr 1fr 100px 120px 40px; gap: 8px; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: start; font-size: 12px; }
+    .bug-row input, .bug-row textarea, .bug-row select { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: #E4E4E7; padding: 6px 10px; border-radius: 6px; font-family: inherit; font-size: 12px; width: 100%; }
+    .bug-row textarea { resize: vertical; min-height: 32px; font-family: inherit; }
+    .bug-row .delete-btn { background: transparent; border: 1px solid rgba(248,113,113,0.2); color: #FCA5A5; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .bug-row .delete-btn:hover { background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.5); }
+
+    .toc-link { display: block; padding: 6px 12px; font-size: 12px; color: #71717A; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+    .toc-link:hover { color: #E4E4E7; background: rgba(255,255,255,0.02); }
+    .toc-link.passed { color: #86EFAC; }
+    .toc-link.passed::before { content: '✓ '; color: #4ADE80; }
+    .toc-link.failed { color: #FCA5A5; }
+    .toc-link.failed::before { content: '✗ '; color: #F87171; }
+    .toc-link[data-bot="captacion"]:hover { border-left-color: #B05A48; }
+    .toc-link[data-bot="alianza"]:hover { border-left-color: #B89A45; }
+    .toc-link[data-bot="requerimiento"]:hover { border-left-color: #B05A8E; }
+    .toc-link[data-bot="edge"]:hover { border-left-color: #ED8936; }
+
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring circle { transition: stroke-dashoffset 0.3s ease; }
+
+    .filter-pill { padding: 6px 14px; border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; background: rgba(255,255,255,0.04); color: #A1A1AA; }
+    .filter-pill:hover { background: rgba(255,255,255,0.08); color: #E4E4E7; }
+    .filter-pill.active { background: rgba(139, 92, 246, 0.18); border-color: rgba(139, 92, 246, 0.4); color: #C4B5FD; }
+    .case-card[data-hidden="true"] { display: none; }
+
+    @media print {
+      .no-print { display: none !important; }
+      .case-card { break-inside: avoid; page-break-inside: avoid; }
+      body { background: white; color: black; }
+    }
+
+    @media (max-width: 1024px) {
+      .toc-sidebar { display: none; }
+    }
+
+    .compra-banner {
+      background: linear-gradient(90deg, rgba(237, 137, 54, 0.08), rgba(139, 92, 246, 0.05));
+      border: 1px solid rgba(237, 137, 54, 0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: #FBD38D;
+    }
+    .compra-banner strong { color: #FED7AA; }
+  </style>
+</head>
+<body class="bg-[#0a0a0b] text-zinc-100 antialiased grain min-h-screen relative">
+
+<div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139, 92, 246, 0.06), transparent 60%);"></div>
+
+<div class="relative max-w-[1500px] mx-auto flex">
+
+  <!-- TOC sidebar -->
+  <aside class="toc-sidebar hidden lg:block w-64 shrink-0 sticky top-0 h-screen pt-16 pl-6 pr-4 overflow-y-auto no-print">
+    <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-3">Casos · 6 + 5 edge</p>
+
+    <div class="flex items-center gap-3 mb-6 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+      <svg class="progress-ring" width="48" height="48" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+        <circle id="progressCircle" cx="24" cy="24" r="20" fill="none" stroke="#8B5CF6" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="125.66"/>
+      </svg>
+      <div>
+        <div class="text-2xl font-semibold leading-none" id="progressNum">0/11</div>
+        <div class="text-[10px] font-mono uppercase tracking-wider text-zinc-500 mt-1">Completados</div>
+      </div>
+    </div>
+
+    <nav class="space-y-0.5 mb-6">
+      <p class="font-mono text-[9px] uppercase tracking-wider text-zinc-600 px-3 mb-1.5">Casos principales</p>
+      <a href="#caso-1" class="toc-link" data-bot="captacion" data-case-toc="1">01 · Captación · Calificado</a>
+      <a href="#caso-2" class="toc-link" data-bot="captacion" data-case-toc="2">02 · Captación · Op. Futura</a>
+      <a href="#caso-3" class="toc-link" data-bot="alianza" data-case-toc="3">03 · Alianza · Calificado</a>
+      <a href="#caso-4" class="toc-link" data-bot="alianza" data-case-toc="4">04 · Alianza · Op. Futura</a>
+      <a href="#caso-5" class="toc-link" data-bot="requerimiento" data-case-toc="5">05 · Requerimiento · Calificado</a>
+      <a href="#caso-6" class="toc-link" data-bot="requerimiento" data-case-toc="6">06 · Requerimiento · Op. Futura</a>
+
+      <p class="font-mono text-[9px] uppercase tracking-wider text-zinc-600 px-3 mb-1.5 mt-4">Edge cases</p>
+      <a href="#ec-1" class="toc-link" data-bot="edge" data-case-toc="ec1">EC1 · Nombre vacío</a>
+      <a href="#ec-2" class="toc-link" data-bot="edge" data-case-toc="ec2">EC2 · Estilo (¿¡, ...)</a>
+      <a href="#ec-3" class="toc-link" data-bot="edge" data-case-toc="ec3">EC3 · Manejo desvíos</a>
+      <a href="#ec-4" class="toc-link" data-bot="edge" data-case-toc="ec4">EC4 · 3 desvíos seguidos</a>
+      <a href="#ec-5" class="toc-link" data-bot="edge" data-case-toc="ec5">EC5 · Stop Bot triggers</a>
+    </nav>
+
+    <div class="space-y-1 mb-4">
+      <a href="#prerequisitos" class="toc-link">⚙️ Pre-requisitos GHL</a>
+      <a href="#bitacora" class="toc-link">🐛 Bitácora de bugs</a>
+      <a href="#resumen-final" class="toc-link">📊 Resumen final</a>
+    </div>
+
+    <div class="pt-4 border-t border-white/[0.06] space-y-2">
+      <button onclick="resetAll()" class="btn btn-reset w-full">Reset progreso</button>
+      <button onclick="exportResults()" class="btn btn-primary w-full">Exportar resultados</button>
+    </div>
+
+    <div class="mt-6 pt-4 border-t border-white/[0.06]">
+      <p class="font-mono text-[9px] uppercase tracking-wider text-zinc-600 mb-1">Cliente</p>
+      <p class="text-xs text-zinc-300">Propiedades Ecuador</p>
+      <p class="text-[10px] text-zinc-600 mt-2 font-mono">v1.0 · sin Compra · 2026-05-06</p>
+    </div>
+  </aside>
+
+  <main class="flex-1 px-6 md:px-10 py-12 md:py-16 max-w-[1100px]">
+
+    <header class="mb-14">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></div>
+        <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500">Test plan · v1.0 · 3 bots</p>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-semibold tracking-tight leading-[1.05] mb-4">
+        Casos de prueba · <span class="text-violet-400">Bots Propiedades Ecuador</span>
+      </h1>
+      <p class="serif-italic text-zinc-400 text-lg max-w-3xl mb-6">
+        6 casos principales (1 calificado + 1 negativo por bot) + 5 edge cases. Validá que cada bot hace todas sus preguntas, confirma antes del handoff, respeta el estilo humano, y termina en el outcome correcto.
+      </p>
+
+      <div class="compra-banner">
+        <span class="text-xl">⚠️</span>
+        <div>
+          <strong>Bot Compra está fuera del alcance de este test.</strong> Quedó pendiente para una iteración separada cuando se cierre el setup de campañas Meta Ads. Si viene el momento, el dashboard completo (con Compra) está en <a href="./casos-prueba.html" class="underline text-violet-300 hover:text-violet-200">casos-prueba.html</a>.
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 mb-2">
+        <div class="badge badge-neutral">⏱ ~40 min principales</div>
+        <div class="badge badge-neutral">+ 15 min edge cases</div>
+        <div class="badge badge-neutral">📍 GHL Live Chat preview o WhatsApp testing</div>
+      </div>
+
+      <p class="text-xs text-zinc-500 mt-4 italic">Tu progreso se guarda automáticamente en este navegador. Si abrís este HTML desde otro dispositivo o navegador, el progreso no se sincroniza.</p>
+    </header>
+
+    <div class="flex items-center gap-2 mb-8 flex-wrap no-print">
+      <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mr-1">Filtrar:</span>
+      <button onclick="filterCases('all')" class="filter-pill active" data-filter="all">Todos</button>
+      <button onclick="filterCases('pending')" class="filter-pill" data-filter="pending">Pendientes</button>
+      <button onclick="filterCases('passed')" class="filter-pill" data-filter="passed">Pasados</button>
+      <button onclick="filterCases('failed')" class="filter-pill" data-filter="failed">Fallidos</button>
+      <span class="mx-2 text-zinc-700">·</span>
+      <button onclick="filterCases('captacion')" class="filter-pill" data-filter="captacion">🟫 Captación</button>
+      <button onclick="filterCases('alianza')" class="filter-pill" data-filter="alianza">🟨 Alianza</button>
+      <button onclick="filterCases('requerimiento')" class="filter-pill" data-filter="requerimiento">🟪 Requerimiento</button>
+    </div>
+
+    <!-- Pre-requisitos -->
+    <section id="prerequisitos" class="case-card mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl">⚙️</span>
+        <h2 class="text-2xl font-semibold tracking-tight">Pre-requisitos en GHL</h2>
+      </div>
+      <p class="text-sm text-zinc-400 mb-4">Verificá ANTES de empezar a testear. Si algo falta, los casos van a fallar por configuración, no por bugs del bot.</p>
+
+      <div class="space-y-1" data-validation-block="prereq">
+        <label class="check-item"><input type="checkbox" data-key="pre-1"><span class="check-label">Workflow <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">INICIO BOT - ORQUESTADOR/CAMPAÑA</code> activo, con triggers múltiples + tag <code class="font-mono text-xs">bot</code> aplicándose al inicio + Activate Bot apuntando al bot correcto en cada rama.</span></label>
+        <label class="check-item"><input type="checkbox" data-key="pre-2"><span class="check-label">Bot Orquestador: toggle "Bot Principal" <strong>OFF</strong>, Initial Message vacío, 3 Bot Transfers configurados (Captación, Alianza, Requerimiento), modelo GPT 4.1 Mini.</span></label>
+        <label class="check-item"><input type="checkbox" data-key="pre-3"><span class="check-label">Bot Captación: 3 CFs creados (TEXT, en carpeta Bot Captación), 2 Workflows publicados, 1 Bot Transfer hacia Alianza.</span></label>
+        <label class="check-item"><input type="checkbox" data-key="pre-4"><span class="check-label">Bot Alianza: <strong>5 CFs</strong> creados, 2 Workflows publicados, sin Bot Transfers de salida (terminal).</span></label>
+        <label class="check-item"><input type="checkbox" data-key="pre-5"><span class="check-label">Bot Requerimiento: 5 CFs creados, 2 Workflows publicados, sin Bot Transfers de salida (terminal).</span></label>
+        <label class="check-item"><input type="checkbox" data-key="pre-6"><span class="check-label">Knowledge Base PROPIEDADES ECUADOR cargada y asignada a los 3 bots especialistas.</span></label>
+        <label class="check-item"><input type="checkbox" data-key="pre-7"><span class="check-label">Custom Value <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">script_seguridad_gps</code> definido (texto del script de seguridad cuando piden GPS prematuro).</span></label>
+      </div>
+    </section>
+
+    <!-- Resumen tabla -->
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold tracking-tight mb-4">📋 Resumen de los 6 casos</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left">
+              <th class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 py-2 px-3">#</th>
+              <th class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 py-2 px-3">Bot</th>
+              <th class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 py-2 px-3">Origen</th>
+              <th class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 py-2 px-3">Esperado</th>
+              <th class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 py-2 px-3">Workflow</th>
+              <th class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 py-2 px-3">Asignado</th>
+            </tr>
+          </thead>
+          <tbody class="text-zinc-300">
+            <tr class="border-t border-white/5"><td class="py-3 px-3 font-mono text-zinc-500">01</td><td class="py-3 px-3"><span class="badge badge-captacion">Captación</span></td><td class="py-3 px-3 text-xs">Orquestador</td><td class="py-3 px-3"><span class="badge badge-ok">✓ Calificado</span></td><td class="py-3 px-3 font-mono text-xs">1- 🟢 LEAD CALIFICADO - CAPTACIÓN</td><td class="py-3 px-3 text-xs"><strong>Katerin</strong></td></tr>
+            <tr class="border-t border-white/5"><td class="py-3 px-3 font-mono text-zinc-500">02</td><td class="py-3 px-3"><span class="badge badge-captacion">Captación</span></td><td class="py-3 px-3 text-xs">Orquestador</td><td class="py-3 px-3"><span class="badge badge-fail">✗ Op. Futura</span></td><td class="py-3 px-3 font-mono text-xs">2- 🔴 OPORTUNIDAD FUTURA - CAPTACIÓN</td><td class="py-3 px-3 text-xs">—</td></tr>
+            <tr class="border-t border-white/5"><td class="py-3 px-3 font-mono text-zinc-500">03</td><td class="py-3 px-3"><span class="badge badge-alianza">Alianza</span></td><td class="py-3 px-3 text-xs">Orquestador</td><td class="py-3 px-3"><span class="badge badge-ok">✓ Calificado</span></td><td class="py-3 px-3 font-mono text-xs">1- 🟢 LEAD CALIFICADO - ALIANZA</td><td class="py-3 px-3 text-xs"><strong>Katerin</strong></td></tr>
+            <tr class="border-t border-white/5"><td class="py-3 px-3 font-mono text-zinc-500">04</td><td class="py-3 px-3"><span class="badge badge-alianza">Alianza</span></td><td class="py-3 px-3 text-xs">Orquestador</td><td class="py-3 px-3"><span class="badge badge-fail">✗ Op. Futura</span></td><td class="py-3 px-3 font-mono text-xs">2- 🔴 OPORTUNIDAD FUTURA - ALIANZA</td><td class="py-3 px-3 text-xs">—</td></tr>
+            <tr class="border-t border-white/5"><td class="py-3 px-3 font-mono text-zinc-500">05</td><td class="py-3 px-3"><span class="badge badge-requerimiento">Requerimiento</span></td><td class="py-3 px-3 text-xs">Orquestador</td><td class="py-3 px-3"><span class="badge badge-ok">✓ Calificado</span></td><td class="py-3 px-3 font-mono text-xs">1- 🟢 LEAD CALIFICADO - REQUERIMIENTO</td><td class="py-3 px-3 text-xs"><strong>Katerin</strong></td></tr>
+            <tr class="border-t border-white/5"><td class="py-3 px-3 font-mono text-zinc-500">06</td><td class="py-3 px-3"><span class="badge badge-requerimiento">Requerimiento</span></td><td class="py-3 px-3 text-xs">Orquestador</td><td class="py-3 px-3"><span class="badge badge-fail">✗ Op. Futura</span></td><td class="py-3 px-3 font-mono text-xs">2- 🔴 OPORTUNIDAD FUTURA - REQUERIMIENTO</td><td class="py-3 px-3 text-xs">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ CASO 1 — CAPTACIÓN CALIFICADO ═══════════════════════ -->
+    <article id="caso-1" class="case-card mb-8" data-bot="captacion" data-case="1">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Caso 01</span>
+            <span class="badge badge-captacion">🟫 Bot Captación</span>
+            <span class="badge badge-ok">✓ Calificado esperado</span>
+            <span class="status-pill status-pending" id="status-1">Pendiente</span>
+          </div>
+          <h3 class="text-2xl font-semibold tracking-tight">Propietario directo · sin deudas · sin exclusividad</h3>
+          <p class="text-sm text-zinc-400 mt-2">Propietario directo con propiedad limpia legalmente y sin contrato exclusivo con otra inmobiliaria.</p>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">📜 Tabla turn-by-turn</p>
+        <div class="rounded-lg overflow-hidden border border-white/5">
+          <table class="turn-table">
+            <thead><tr><th>#</th><th>Quién</th><th>Mensaje</th></tr></thead>
+            <tbody>
+              <tr><td class="turn-num">1</td><td><span class="actor-system">Workflow ORQUESTADOR</span></td><td class="msg-system">(envía saludo de bienvenida con las 4 opciones)</td></tr>
+              <tr><td class="turn-num">2</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Tengo una casa para vender</td></tr>
+              <tr><td class="turn-num">3</td><td><span class="actor-bot">Orquestador</span></td><td class="msg-bot">Perfecto, podemos ayudarte a vender. Qué tipo de propiedad querés publicar y en qué zona se encuentra?</td></tr>
+              <tr><td class="turn-num">4</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Una casa en Cumbayá</td></tr>
+              <tr><td class="turn-num">5</td><td><span class="actor-system">Orq → Bot Transfer</span></td><td class="msg-system">(Bot Transfer a Bot Captación)</td></tr>
+              <tr><td class="turn-num">6</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Hola [nombre], soy Katherine de captaciones... te ayudo desde acá. Eres el propietario directo o consultas por alguien más? <span class="text-xs text-zinc-500">(P1)</span></td></tr>
+              <tr><td class="turn-num">7</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí, soy el dueño directo</td></tr>
+              <tr><td class="turn-num">8</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">La propiedad está al día legalmente, sin deudas ni hipotecas? <span class="text-xs text-zinc-500">(P2)</span></td></tr>
+              <tr><td class="turn-num">9</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Todo al día, sin deudas</td></tr>
+              <tr><td class="turn-num">10</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Otra inmobiliaria la está publicando con contrato exclusivo? <span class="text-xs text-zinc-500">(P3)</span></td></tr>
+              <tr><td class="turn-num">11</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">No, está libre</td></tr>
+              <tr class="turn-row-new"><td class="turn-num">12</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot"><span class="new-tag">NUEVO v1.0</span>Repaso para confirmar: eres el propietario directo, sin deudas, libre de exclusividad... está bien así?</td></tr>
+              <tr><td class="turn-num">13</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí, correcto</td></tr>
+              <tr><td class="turn-num">14</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Perfecto, anoté todo... en breve te escribe Katerin del equipo para coordinar la captación.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">✅ Checklist de validación</p>
+        <div class="space-y-1" data-validation-block="1">
+          <label class="check-item"><input type="checkbox" data-key="c1-1"><span class="check-label">Bot habla como <strong>Katherine</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-2"><span class="check-label">Bot Captación NO se re-presenta con saludo largo (orquestador ya saludó)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-3"><span class="check-label">Bot hizo <strong>las 3 preguntas en orden</strong> (propietario → deudas → exclusividad)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-4"><span class="check-label"><strong>Confirmación final</strong> ejecutada antes del cierre (turno 12)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-5"><span class="check-label"><strong>Estilo OK</strong>: sin ¿¡, puntos suspensivos al menos 1 vez</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-6"><span class="check-label">CFs <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿Es propietario directo?</code> · <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿La propiedad tiene deudas?</code> · <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿Otra inmobiliaria la publica?</code> llenos con texto literal</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-7"><span class="check-label">Se disparó <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">1- 🟢 LEAD CALIFICADO - CAPTACIÓN</code></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-8"><span class="check-label">Oportunidad → <strong>Calificado</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c1-9"><span class="check-label">Contacto <strong>asignado a Katerin</strong></span></label>
+        </div>
+      </div>
+
+      <div class="note-lateral">
+        <strong>Variante PASO 0 (info implícita):</strong> si el lead llega con <em>"Hola, soy el dueño de una casa en Cumbayá, sin deudas y no la publica nadie, quiero venderla"</em> → el bot NO debe re-preguntar P1, P2, P3. Debe saltar al paso 5 (confirmación) directo.<br><br>
+        <strong>Nota cross-bot:</strong> si en P1 (turno 7) el lead hubiera dicho <em>"soy corredor"</em> → el bot NO sigue con P2/P3. Mensaje de transición + <strong>Bot Transfer a Bot Alianza</strong>.
+      </div>
+
+      <div class="case-actions no-print">
+        <button onclick="markCase('1', 'passed')" class="btn btn-pass">✓ Marcar pasado</button>
+        <button onclick="markCase('1', 'failed')" class="btn btn-fail">✗ Marcar fallido</button>
+        <button onclick="markCase('1', 'pending')" class="btn btn-reset">Reset caso</button>
+      </div>
+    </article>
+
+    <!-- ═══════════════════════ CASO 2 — CAPTACIÓN OP. FUTURA ═══════════════════════ -->
+    <article id="caso-2" class="case-card mb-8" data-bot="captacion" data-case="2">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Caso 02</span>
+            <span class="badge badge-captacion">🟫 Bot Captación</span>
+            <span class="badge badge-fail">✗ Op. Futura esperada</span>
+            <span class="status-pill status-pending" id="status-2">Pendiente</span>
+          </div>
+          <h3 class="text-2xl font-semibold tracking-tight">Propietario directo con hipoteca activa</h3>
+          <p class="text-sm text-zinc-400 mt-2">Es el dueño pero la propiedad tiene hipoteca activa con un banco — deuda crítica.</p>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">📜 Tabla turn-by-turn</p>
+        <div class="rounded-lg overflow-hidden border border-white/5">
+          <table class="turn-table">
+            <thead><tr><th>#</th><th>Quién</th><th>Mensaje</th></tr></thead>
+            <tbody>
+              <tr><td class="turn-num">1</td><td><span class="actor-system">Workflow ORQUESTADOR</span></td><td class="msg-system">(envía saludo + 4 opciones)</td></tr>
+              <tr><td class="turn-num">2</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Tengo una casa para vender</td></tr>
+              <tr><td class="turn-num">3</td><td><span class="actor-bot">Orquestador</span></td><td class="msg-bot">(transición + transfer a Captación)</td></tr>
+              <tr><td class="turn-num">4</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Hola [nombre], soy Katherine... eres el propietario directo? <span class="text-xs text-zinc-500">(P1)</span></td></tr>
+              <tr><td class="turn-num">5</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Soy el dueño</td></tr>
+              <tr><td class="turn-num">6</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Está al día sin deudas? <span class="text-xs text-zinc-500">(P2)</span></td></tr>
+              <tr><td class="turn-num">7</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Tengo hipoteca activa con el banco Pichincha</td></tr>
+              <tr><td class="turn-num">8</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Anotado... el equipo evalúa caso por caso. Otra inmobiliaria la publica? <span class="text-xs text-zinc-500">(P3)</span></td></tr>
+              <tr><td class="turn-num">9</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">No, está libre</td></tr>
+              <tr class="turn-row-new"><td class="turn-num">10</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot"><span class="new-tag">NUEVO v1.0</span>Repaso: eres el propietario, con hipoteca activa del Pichincha, libre de otra inmobiliaria... está bien?</td></tr>
+              <tr><td class="turn-num">11</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí</td></tr>
+              <tr><td class="turn-num">12</td><td><span class="actor-bot" data-bot="captacion">Katherine</span></td><td class="msg-bot">Anotamos todo... igual te escribimos más adelante para ver cómo podemos avanzar.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">✅ Checklist de validación</p>
+        <div class="space-y-1" data-validation-block="2">
+          <label class="check-item"><input type="checkbox" data-key="c2-1"><span class="check-label">Bot completó <strong>las 3 preguntas</strong> (NO se cortó al detectar hipoteca)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c2-2"><span class="check-label">CF deudas registra "hipoteca activa banco Pichincha" (texto literal del lead)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c2-3"><span class="check-label"><strong>Confirmación final</strong> menciona la hipoteca sin endulzarla</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c2-4"><span class="check-label"><strong>Estilo OK</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c2-5"><span class="check-label">Se disparó <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">2- 🔴 OPORTUNIDAD FUTURA - CAPTACIÓN</code></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c2-6"><span class="check-label">Oportunidad → <strong>Op. Futura</strong></span></label>
+        </div>
+      </div>
+
+      <div class="case-actions no-print">
+        <button onclick="markCase('2', 'passed')" class="btn btn-pass">✓ Marcar pasado</button>
+        <button onclick="markCase('2', 'failed')" class="btn btn-fail">✗ Marcar fallido</button>
+        <button onclick="markCase('2', 'pending')" class="btn btn-reset">Reset caso</button>
+      </div>
+    </article>
+
+    <!-- ═══════════════════════ CASO 3 — ALIANZA CALIFICADO ═══════════════════════ -->
+    <article id="caso-3" class="case-card mb-8" data-bot="alianza" data-case="3">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Caso 03</span>
+            <span class="badge badge-alianza">🟨 Bot Alianza</span>
+            <span class="badge badge-ok">✓ Calificado esperado</span>
+            <span class="status-pill status-pending" id="status-3">Pendiente</span>
+          </div>
+          <h3 class="text-2xl font-semibold tracking-tight">Corredor con licencia + acepta contrato escrito</h3>
+          <p class="text-sm text-zinc-400 mt-2">Caso A — corredor llega del Orquestador, acepta firmar contrato escrito y tiene licencia profesional vigente.</p>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">📜 Tabla turn-by-turn</p>
+        <div class="rounded-lg overflow-hidden border border-white/5">
+          <table class="turn-table">
+            <thead><tr><th>#</th><th>Quién</th><th>Mensaje</th></tr></thead>
+            <tbody>
+              <tr><td class="turn-num">1</td><td><span class="actor-system">Workflow ORQUESTADOR</span></td><td class="msg-system">(saludo + 4 opciones)</td></tr>
+              <tr><td class="turn-num">2</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Soy corredor, quiero hacer alianza</td></tr>
+              <tr><td class="turn-num">3</td><td><span class="actor-bot">Orquestador</span></td><td class="msg-bot">Buenísimo, trabajemos en conjunto. De qué inmobiliaria sos parte?</td></tr>
+              <tr><td class="turn-num">4</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Re/Max</td></tr>
+              <tr><td class="turn-num">5</td><td><span class="actor-system">Orq → Bot Transfer</span></td><td class="msg-system">(transfer a Bot Alianza — Caso A)</td></tr>
+              <tr><td class="turn-num">6</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Hola [nombre], soy Katherine de Propiedades Ecuador, manejo las alianzas con corredores... te hago unas preguntitas rápidas. De qué inmobiliaria sos parte y qué tipo de propiedades manejás, en qué zona? <span class="text-xs text-zinc-500">(P1)</span></td></tr>
+              <tr><td class="turn-num">7</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Soy de Re/Max, manejo casas y deptos en Guayaquil norte</td></tr>
+              <tr><td class="turn-num">8</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Trabajamos siempre con contrato escrito para proteger ambas partes... aceptás firmar? <span class="text-xs text-zinc-500">(P2)</span></td></tr>
+              <tr><td class="turn-num">9</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí, sin problema firmo</td></tr>
+              <tr><td class="turn-num">10</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Tenés licencia profesional vigente, o trabajás como empírico? <span class="text-xs text-zinc-500">(P3)</span></td></tr>
+              <tr><td class="turn-num">11</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí, licenciado, CBR 1234</td></tr>
+              <tr class="turn-row-new"><td class="turn-num">12</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot"><span class="new-tag">NUEVO v1.0</span>Repaso para confirmar: sos de Re/Max, manejás casas y deptos en Guayaquil norte, aceptás contrato escrito, con licencia CBR 1234... está bien?</td></tr>
+              <tr><td class="turn-num">13</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí, correcto</td></tr>
+              <tr><td class="turn-num">14</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Perfecto, anoté todo... en breve te escribe Katerin para coordinar la alianza.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">✅ Checklist de validación</p>
+        <div class="space-y-1" data-validation-block="3">
+          <label class="check-item"><input type="checkbox" data-key="c3-1"><span class="check-label">Bot habla como <strong>Katherine de alianzas</strong> (Caso A — presentación completa)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-2"><span class="check-label">Bot hizo <strong>las 3 preguntas en orden</strong> (P1 captura 3 datos en 1 turno)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-3"><span class="check-label"><strong>Confirmación final</strong> ejecutada antes del cierre (turno 12)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-4"><span class="check-label"><strong>Estilo OK</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-5"><span class="check-label">CF <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿Nombre de la inmobiliaria?</code> = "Re/Max"</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-6"><span class="check-label">CF <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿Qué tipo de propiedades maneja?</code> = "casas y deptos"</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-7"><span class="check-label">CF <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿En qué zona opera?</code> = "Guayaquil norte"</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-8"><span class="check-label">CF <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿Acepta contrato escrito?</code> = "sí, sin problema firmo"</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-9"><span class="check-label">CF <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">¿Tiene licencia profesional?</code> = "sí, licenciado, CBR 1234"</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-10"><span class="check-label">Se disparó <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">1- 🟢 LEAD CALIFICADO - ALIANZA</code></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-11"><span class="check-label">Oportunidad → <strong>Calificado</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c3-12"><span class="check-label">Contacto <strong>asignado a Katerin</strong></span></label>
+        </div>
+      </div>
+
+      <div class="note-lateral">
+        <strong>Variante calificado-empírico:</strong> si en P3 (turno 11) hubiera dicho <em>"empírico, 15 años de experiencia"</em> → SIGUE calificado. P3 NO bloquea. Mismo workflow se dispara.<br><br>
+        <strong>Variante Caso B (cross-bot desde Captación):</strong> si el lead llegara via Bot Captación, Bot Alianza debe arrancar <strong>SIN re-presentación</strong> ("Listo, las alianzas las manejo yo igual..." en lugar de "Hola soy Katherine...").
+      </div>
+
+      <div class="case-actions no-print">
+        <button onclick="markCase('3', 'passed')" class="btn btn-pass">✓ Marcar pasado</button>
+        <button onclick="markCase('3', 'failed')" class="btn btn-fail">✗ Marcar fallido</button>
+        <button onclick="markCase('3', 'pending')" class="btn btn-reset">Reset caso</button>
+      </div>
+    </article>
+
+    <!-- ═══════════════════════ CASO 4 — ALIANZA OP. FUTURA ═══════════════════════ -->
+    <article id="caso-4" class="case-card mb-8" data-bot="alianza" data-case="4">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Caso 04</span>
+            <span class="badge badge-alianza">🟨 Bot Alianza</span>
+            <span class="badge badge-fail">✗ Op. Futura esperada</span>
+            <span class="status-pill status-pending" id="status-4">Pendiente</span>
+          </div>
+          <h3 class="text-2xl font-semibold tracking-tight">Corredor que rechaza contrato escrito</h3>
+          <p class="text-sm text-zinc-400 mt-2">Solo verbal — bot debe cortar el flow en P2 sin avanzar a P3.</p>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">📜 Tabla turn-by-turn</p>
+        <div class="rounded-lg overflow-hidden border border-white/5">
+          <table class="turn-table">
+            <thead><tr><th>#</th><th>Quién</th><th>Mensaje</th></tr></thead>
+            <tbody>
+              <tr><td class="turn-num">1</td><td><span class="actor-system">Workflow ORQUESTADOR</span></td><td class="msg-system">(saludo)</td></tr>
+              <tr><td class="turn-num">2</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Soy corredor, quiero hacer alianza</td></tr>
+              <tr><td class="turn-num">3</td><td><span class="actor-bot">Orquestador</span></td><td class="msg-bot">(transición + transfer a Alianza)</td></tr>
+              <tr><td class="turn-num">4</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Hola, soy Katherine... de qué inmobiliaria sos? <span class="text-xs text-zinc-500">(P1)</span></td></tr>
+              <tr><td class="turn-num">5</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Inmobiliaria ABC, fincas en Pedro Carbo</td></tr>
+              <tr><td class="turn-num">6</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Aceptás trabajar con contrato escrito? <span class="text-xs text-zinc-500">(P2)</span></td></tr>
+              <tr><td class="turn-num">7</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">No, prefiero verbal, no firmo nada</td></tr>
+              <tr><td class="turn-num">8</td><td><span class="actor-bot" data-bot="alianza">Katherine</span></td><td class="msg-bot">Entendido, nosotros siempre vamos con contrato escrito para proteger ambas partes... te dejo abierto por si cambiás de opinión.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">✅ Checklist de validación</p>
+        <div class="space-y-1" data-validation-block="4">
+          <label class="check-item"><input type="checkbox" data-key="c4-1"><span class="check-label">Bot <strong>NO hizo P3</strong> (P2 bloquea — corta el flow al recibir NO)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c4-2"><span class="check-label">CFs P1 (inmobiliaria + tipo + zona) llenos · CF P2 = "no, prefiero verbal" · CF P3 (licencia) <strong>vacío</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c4-3"><span class="check-label"><strong>Estilo OK</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c4-4"><span class="check-label">Se disparó <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">2- 🔴 OPORTUNIDAD FUTURA - ALIANZA</code></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c4-5"><span class="check-label">Oportunidad → <strong>Op. Futura</strong></span></label>
+        </div>
+      </div>
+
+      <div class="case-actions no-print">
+        <button onclick="markCase('4', 'passed')" class="btn btn-pass">✓ Marcar pasado</button>
+        <button onclick="markCase('4', 'failed')" class="btn btn-fail">✗ Marcar fallido</button>
+        <button onclick="markCase('4', 'pending')" class="btn btn-reset">Reset caso</button>
+      </div>
+    </article>
+
+    <!-- ═══════════════════════ CASO 5 — REQUERIMIENTO CALIFICADO ═══════════════════════ -->
+    <article id="caso-5" class="case-card mb-8" data-bot="requerimiento" data-case="5">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Caso 05</span>
+            <span class="badge badge-requerimiento">🟪 Bot Requerimiento</span>
+            <span class="badge badge-ok">✓ Calificado esperado</span>
+            <span class="status-pill status-pending" id="status-5">Pendiente</span>
+          </div>
+          <h3 class="text-2xl font-semibold tracking-tight">Briefing completo · 5 datos</h3>
+          <p class="text-sm text-zinc-400 mt-2">Lead que busca casa con briefing completo. <strong>2 sub-variantes de origen</strong> — ejecutar al menos una:</p>
+          <ul class="text-sm text-zinc-400 mt-2 ml-4 list-disc space-y-1">
+            <li><strong>5A</strong>: Lead arranca con "Quiero comprar una propiedad" en el orquestador → llega a Requerimiento.</li>
+            <li><strong>5B</strong>: Lead arranca con "Busco una camaronera en Guayas, no veo nada en su web" en el orquestador → llega a Requerimiento.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">📜 Tabla turn-by-turn</p>
+        <div class="rounded-lg overflow-hidden border border-white/5">
+          <table class="turn-table">
+            <thead><tr><th>#</th><th>Quién</th><th>Mensaje</th></tr></thead>
+            <tbody>
+              <tr><td class="turn-num">1</td><td><span class="actor-system">Workflow ORQUESTADOR</span></td><td class="msg-system">(saludo)</td></tr>
+              <tr><td class="turn-num">2</td><td><span class="actor-lead">Lead (5A)</span></td><td class="msg-lead">Quiero comprar una propiedad <em class="text-zinc-600">— o (5B): Busco una camaronera en Guayas, no veo nada en su web</em></td></tr>
+              <tr><td class="turn-num">3</td><td><span class="actor-bot">Orquestador</span></td><td class="msg-bot">(transición + transfer a Requerimiento)</td></tr>
+              <tr><td class="turn-num">4</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Hola [nombre], soy Katherine... te tomo nota de 5 datitos rápidos para buscarte algo a medida. Primero: qué tipo de propiedad buscas — casa, departamento, terreno, finca, camaronera, comercial? <span class="text-xs text-zinc-500">(P1)</span></td></tr>
+              <tr><td class="turn-num">5</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Casa</td></tr>
+              <tr><td class="turn-num">6</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Cuántas habitaciones necesitas? <span class="text-xs text-zinc-500">(P2)</span></td></tr>
+              <tr><td class="turn-num">7</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">3 habitaciones</td></tr>
+              <tr><td class="turn-num">8</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">En qué zona buscas? <span class="text-xs text-zinc-500">(P3)</span></td></tr>
+              <tr><td class="turn-num">9</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Cumbayá o Tumbaco</td></tr>
+              <tr><td class="turn-num">10</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Cuál es tu presupuesto aproximado? <span class="text-xs text-zinc-500">(P4)</span></td></tr>
+              <tr><td class="turn-num">11</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Entre 200 y 300 mil</td></tr>
+              <tr><td class="turn-num">12</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Es para uso propio o inversión? <span class="text-xs text-zinc-500">(P5)</span></td></tr>
+              <tr><td class="turn-num">13</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Uso propio, para mi familia</td></tr>
+              <tr class="turn-row-new"><td class="turn-num">14</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot"><span class="new-tag">NUEVO v1.0</span>Repaso para confirmar: buscas casa, 3 habitaciones, en Cumbayá o Tumbaco, presupuesto 200-300k, para uso propio... está bien así?</td></tr>
+              <tr><td class="turn-num">15</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Sí, está bien</td></tr>
+              <tr><td class="turn-num">16</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Perfecto, anoté tu briefing... Katerin empieza a buscarte opciones off-market y te avisa apenas tenga algo.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">✅ Checklist de validación</p>
+        <div class="space-y-1" data-validation-block="5">
+          <label class="check-item"><input type="checkbox" data-key="c5-1"><span class="check-label">Bot hizo <strong>las 5 preguntas en orden</strong> (tipo → habs → zona → presupuesto → uso)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c5-2"><span class="check-label"><strong>Confirmación final</strong> ejecutada (turno 14)</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c5-3"><span class="check-label"><strong>Estilo OK</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c5-4"><span class="check-label">Los <strong>5 CFs</strong> de Requerimiento llenos con texto literal del lead</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c5-5"><span class="check-label">Se disparó <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">1- 🟢 LEAD CALIFICADO - REQUERIMIENTO</code></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c5-6"><span class="check-label">Oportunidad → <strong>Calificado</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c5-7"><span class="check-label">Contacto <strong>asignado a Katerin</strong></span></label>
+        </div>
+      </div>
+
+      <div class="note-lateral">
+        <strong>Variante SKIP de habitaciones:</strong> si en P1 (turno 5) el lead dijera <em>"terreno"</em> o <em>"comercial"</em> → el bot DEBE saltear P2 automáticamente y pasar directo a P3 zona. CF <code class="font-mono text-xs bg-white/10 px-1.5 py-0.5 rounded">¿Cuántas habitaciones necesita?</code> debe quedar como <strong>"no aplica"</strong>. Validar en pasada extra (alta prioridad).
+      </div>
+
+      <div class="case-actions no-print">
+        <button onclick="markCase('5', 'passed')" class="btn btn-pass">✓ Marcar pasado</button>
+        <button onclick="markCase('5', 'failed')" class="btn btn-fail">✗ Marcar fallido</button>
+        <button onclick="markCase('5', 'pending')" class="btn btn-reset">Reset caso</button>
+      </div>
+    </article>
+
+    <!-- ═══════════════════════ CASO 6 — REQUERIMIENTO OP. FUTURA ═══════════════════════ -->
+    <article id="caso-6" class="case-card mb-8" data-bot="requerimiento" data-case="6">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Caso 06</span>
+            <span class="badge badge-requerimiento">🟪 Bot Requerimiento</span>
+            <span class="badge badge-fail">✗ Op. Futura esperada</span>
+            <span class="status-pill status-pending" id="status-6">Pendiente</span>
+          </div>
+          <h3 class="text-2xl font-semibold tracking-tight">Lead abandona briefing a medio camino · 3 de 5</h3>
+          <p class="text-sm text-zinc-400 mt-2">Lead responde P1 y P2 pero abandona en P3 (corta la conversación con "después te escribo").</p>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">📜 Tabla turn-by-turn</p>
+        <div class="rounded-lg overflow-hidden border border-white/5">
+          <table class="turn-table">
+            <thead><tr><th>#</th><th>Quién</th><th>Mensaje</th></tr></thead>
+            <tbody>
+              <tr><td class="turn-num">1</td><td><span class="actor-system">Workflow ORQUESTADOR</span></td><td class="msg-system">(saludo)</td></tr>
+              <tr><td class="turn-num">2</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Busco algo, no veo nada en su web</td></tr>
+              <tr><td class="turn-num">3</td><td><span class="actor-bot">Orquestador</span></td><td class="msg-bot">(transición + transfer a Requerimiento)</td></tr>
+              <tr><td class="turn-num">4</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Hola, soy Katherine... qué tipo de propiedad buscas? <span class="text-xs text-zinc-500">(P1)</span></td></tr>
+              <tr><td class="turn-num">5</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Casa</td></tr>
+              <tr><td class="turn-num">6</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Cuántas habitaciones? <span class="text-xs text-zinc-500">(P2)</span></td></tr>
+              <tr><td class="turn-num">7</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">3</td></tr>
+              <tr><td class="turn-num">8</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">En qué zona? <span class="text-xs text-zinc-500">(P3)</span></td></tr>
+              <tr><td class="turn-num">9</td><td><span class="actor-lead">Lead</span></td><td class="msg-lead">Después te escribo, ahora no puedo seguir</td></tr>
+              <tr><td class="turn-num">10</td><td><span class="actor-bot" data-bot="requerimiento">Katherine</span></td><td class="msg-bot">Anotamos lo que tenemos... si después querés ampliar, escribime.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">✅ Checklist de validación</p>
+        <div class="space-y-1" data-validation-block="6">
+          <label class="check-item"><input type="checkbox" data-key="c6-1"><span class="check-label">CFs P1, P2 llenos · P3, P4, P5 vacíos o "incompleto"</span></label>
+          <label class="check-item"><input type="checkbox" data-key="c6-2"><span class="check-label"><strong>Estilo OK</strong></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c6-3"><span class="check-label">Se disparó <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">2- 🔴 OPORTUNIDAD FUTURA - REQUERIMIENTO</code></span></label>
+          <label class="check-item"><input type="checkbox" data-key="c6-4"><span class="check-label">Oportunidad → <strong>Op. Futura</strong></span></label>
+        </div>
+      </div>
+
+      <div class="case-actions no-print">
+        <button onclick="markCase('6', 'passed')" class="btn btn-pass">✓ Marcar pasado</button>
+        <button onclick="markCase('6', 'failed')" class="btn btn-fail">✗ Marcar fallido</button>
+        <button onclick="markCase('6', 'pending')" class="btn btn-reset">Reset caso</button>
+      </div>
+    </article>
+
+    <!-- ═══════════════════════ EDGE CASES ═══════════════════════ -->
+    <section class="mt-20 mb-10">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-2xl">🔍</span>
+        <h2 class="text-3xl font-semibold tracking-tight">Edge cases · pasada extra</h2>
+      </div>
+      <p class="serif-italic text-zinc-400 max-w-2xl">5 mini-tests para validar features críticas que el flujo principal no cubre. ~15 min total. Recomendado después de los 6 casos principales.</p>
+    </section>
+
+    <article id="ec-1" class="case-card mb-6" data-bot="edge" data-case="ec1">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Edge Case 1</span>
+        <span class="badge badge-edge">🔧 Configuración</span>
+        <span class="status-pill status-pending" id="status-ec1">Pendiente</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight mb-3">Manejo de <code class="font-mono text-base">{{contact.name}}</code> vacío</h3>
+      <p class="text-sm text-zinc-400 mb-4">Configurá un contacto de prueba en GHL <strong>sin</strong> First Name (dejá el campo vacío o con un número de teléfono). Ejecutá cualquier caso (recomendado: Caso 1 Captación o Caso 5 Requerimiento).</p>
+      <div class="space-y-1" data-validation-block="ec1">
+        <label class="check-item"><input type="checkbox" data-key="ec1-1"><span class="check-label">El bot saluda <strong>sin</strong> usar nombre: "Hola, soy Katherine..." (NO "Hola , soy Katherine...")</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec1-2"><span class="check-label"><strong>Antes de la confirmación final</strong>, el bot pide el nombre: "Antes de pasarte con Katerin, cómo te llamas?"</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec1-3"><span class="check-label">El lead responde con un nombre → el bot lo guarda como Contact First Name (verificar en panel del contacto en GHL)</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec1-4"><span class="check-label">El bot continúa con el resumen de confirmación normalmente</span></label>
+      </div>
+      <div class="case-actions no-print">
+        <button onclick="markCase('ec1', 'passed')" class="btn btn-pass">✓ Pasado</button>
+        <button onclick="markCase('ec1', 'failed')" class="btn btn-fail">✗ Fallido</button>
+        <button onclick="markCase('ec1', 'pending')" class="btn btn-reset">Reset</button>
+      </div>
+    </article>
+
+    <article id="ec-2" class="case-card mb-6" data-bot="edge" data-case="ec2">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Edge Case 2</span>
+        <span class="badge badge-edge">🎨 Estilo humano</span>
+        <span class="status-pill status-pending" id="status-ec2">Pendiente</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight mb-3">Estilo en todos los bots (sin <code class="font-mono text-base">¿ ¡</code>, puntos suspensivos)</h3>
+      <p class="text-sm text-zinc-400 mb-4">Validar a lo largo de los 6 casos principales. No se ejecuta aparte — es checklist transversal.</p>
+      <div class="space-y-1" data-validation-block="ec2">
+        <label class="check-item"><input type="checkbox" data-key="ec2-1"><span class="check-label">El bot NUNCA escribió "¿..." o "¡..." al inicio de una pregunta o exclamación (en los 6 casos)</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec2-2"><span class="check-label">El bot SÍ usó "..." (puntos suspensivos) al final de alguna oración, al menos 1 vez por flow</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec2-3"><span class="check-label">El bot suena humano, no robótico (en los 6 casos)</span></label>
+      </div>
+      <div class="case-actions no-print">
+        <button onclick="markCase('ec2', 'passed')" class="btn btn-pass">✓ Pasado</button>
+        <button onclick="markCase('ec2', 'failed')" class="btn btn-fail">✗ Fallido</button>
+        <button onclick="markCase('ec2', 'pending')" class="btn btn-reset">Reset</button>
+      </div>
+    </article>
+
+    <article id="ec-3" class="case-card mb-6" data-bot="edge" data-case="ec3">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Edge Case 3</span>
+        <span class="badge badge-edge">🔄 Manejo de desvíos</span>
+        <span class="status-pill status-pending" id="status-ec3">Pendiente</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight mb-3">Lead pregunta otra cosa · bot retoma la pregunta filtro</h3>
+      <p class="text-sm text-zinc-400 mb-4">Durante cualquier caso, en la pregunta filtro 2 o 3, en lugar de responder, hacé una pregunta no relacionada.<br><strong>Ejemplo:</strong> en Caso 1 (Captación) durante P3, respondé <em>"qué comisión cobran ustedes?"</em></p>
+      <div class="space-y-1" data-validation-block="ec3">
+        <label class="check-item"><input type="checkbox" data-key="ec3-1"><span class="check-label">El bot responde brevemente la pregunta del lead (con info de KB o "eso lo cierra Katerin después")</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec3-2"><span class="check-label">En el MISMO mensaje, retoma la pregunta filtro pendiente: "...y volviendo a lo nuestro, otra inmobiliaria la está publicando?"</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec3-3"><span class="check-label">El bot NO abandona la pregunta filtro</span></label>
+      </div>
+      <div class="case-actions no-print">
+        <button onclick="markCase('ec3', 'passed')" class="btn btn-pass">✓ Pasado</button>
+        <button onclick="markCase('ec3', 'failed')" class="btn btn-fail">✗ Fallido</button>
+        <button onclick="markCase('ec3', 'pending')" class="btn btn-reset">Reset</button>
+      </div>
+    </article>
+
+    <article id="ec-4" class="case-card mb-6" data-bot="edge" data-case="ec4">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Edge Case 4</span>
+        <span class="badge badge-edge">⚠️ 3 desvíos seguidos</span>
+        <span class="status-pill status-pending" id="status-ec4">Pendiente</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight mb-3">3 desvíos seguidos → Op. Futura automática</h3>
+      <p class="text-sm text-zinc-400 mb-4">En cualquier caso, desviar al bot 3 veces consecutivas sin responder ninguna pregunta filtro.</p>
+      <div class="space-y-1" data-validation-block="ec4">
+        <label class="check-item"><input type="checkbox" data-key="ec4-1"><span class="check-label">Después del 3er desvío, el bot manda mensaje cordial ("Entiendo que tienes muchas dudas... mejor Katerin te llama")</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec4-2"><span class="check-label">Se dispara <strong>Trigger Workflow Op. Futura</strong> + Stop Bot</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec4-3"><span class="check-label">CFs llenos solo con lo que se haya capturado hasta ese momento</span></label>
+      </div>
+      <div class="case-actions no-print">
+        <button onclick="markCase('ec4', 'passed')" class="btn btn-pass">✓ Pasado</button>
+        <button onclick="markCase('ec4', 'failed')" class="btn btn-fail">✗ Fallido</button>
+        <button onclick="markCase('ec4', 'pending')" class="btn btn-reset">Reset</button>
+      </div>
+    </article>
+
+    <article id="ec-5" class="case-card mb-6" data-bot="edge" data-case="ec5">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Edge Case 5</span>
+        <span class="badge badge-edge">🛑 Stop Bot triggers</span>
+        <span class="status-pill status-pending" id="status-ec5">Pendiente</span>
+      </div>
+      <h3 class="text-xl font-semibold tracking-tight mb-3">GPS prematuro · pide humano · audio sin texto</h3>
+      <p class="text-sm text-zinc-400 mb-4">3 sub-tests rápidos:</p>
+      <div class="space-y-1" data-validation-block="ec5">
+        <label class="check-item"><input type="checkbox" data-key="ec5-1"><span class="check-label"><strong>Test 5a:</strong> antes de terminar las preguntas, pedí "dame la dirección exacta de la propiedad" → Bot responde con <code class="font-mono text-xs bg-white/5 px-1.5 py-0.5 rounded">{{custom_values.script_seguridad_gps}}</code> + Stop Bot</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec5-2"><span class="check-label"><strong>Test 5b:</strong> decí "quiero hablar con un humano" → Bot ejecuta Stop Bot inmediato sin completar preguntas</span></label>
+        <label class="check-item"><input type="checkbox" data-key="ec5-3"><span class="check-label"><strong>Test 5c:</strong> mandá 2 audios sin texto seguidos. Primer audio: bot pide "me ayudás escribiendo?". Segundo audio: Stop Bot</span></label>
+      </div>
+      <div class="case-actions no-print">
+        <button onclick="markCase('ec5', 'passed')" class="btn btn-pass">✓ Pasado</button>
+        <button onclick="markCase('ec5', 'failed')" class="btn btn-fail">✗ Fallido</button>
+        <button onclick="markCase('ec5', 'pending')" class="btn btn-reset">Reset</button>
+      </div>
+    </article>
+
+    <!-- BITÁCORA -->
+    <section id="bitacora" class="case-card mt-16 mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl">🐛</span>
+        <h2 class="text-2xl font-semibold tracking-tight">Bitácora de bugs</h2>
+      </div>
+      <p class="text-sm text-zinc-400 mb-4">Cada bug que encontrás durante el testing. Se guarda automáticamente. Exportable al final.</p>
+
+      <div class="rounded-lg overflow-hidden border border-white/5 bg-black/20">
+        <div class="bug-row font-mono text-[9px] uppercase tracking-wider text-zinc-500 bg-white/[0.02]">
+          <div>#</div><div>Caso · Qué pasó</div><div>Qué esperabas</div><div>Severidad</div><div>Bot afectado</div><div></div>
+        </div>
+        <div id="bugList"></div>
+      </div>
+
+      <div class="mt-4">
+        <button onclick="addBug()" class="btn btn-primary">+ Agregar bug</button>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+          <p class="font-mono text-[10px] uppercase text-red-400 mb-1">Alta</p>
+          <p class="text-zinc-400">No transfiere · no captura CFs · workflow equivocado · asignación incorrecta · GPS prematuro · doble disparo</p>
+        </div>
+        <div class="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20">
+          <p class="font-mono text-[10px] uppercase text-amber-400 mb-1">Media</p>
+          <p class="text-zinc-400">Bot rompe estilo (¿¡) · no hace confirmación final · tono raro</p>
+        </div>
+        <div class="p-3 rounded-lg bg-zinc-500/5 border border-zinc-500/20">
+          <p class="font-mono text-[10px] uppercase text-zinc-400 mb-1">Baja</p>
+          <p class="text-zinc-500">Typo · emoji extra · frase rara que no afecta el flow</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUMEN FINAL -->
+    <section id="resumen-final" class="case-card mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-2xl">📊</span>
+        <h2 class="text-2xl font-semibold tracking-tight">Resumen final del test</h2>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-center">
+          <p class="text-3xl font-semibold text-emerald-400" id="totalPassed">0</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Pasados</p>
+        </div>
+        <div class="p-4 rounded-lg bg-red-500/5 border border-red-500/20 text-center">
+          <p class="text-3xl font-semibold text-red-400" id="totalFailed">0</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Fallidos</p>
+        </div>
+        <div class="p-4 rounded-lg bg-zinc-500/5 border border-zinc-500/20 text-center">
+          <p class="text-3xl font-semibold text-zinc-300" id="totalPending">11</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Pendientes</p>
+        </div>
+        <div class="p-4 rounded-lg bg-violet-500/5 border border-violet-500/20 text-center">
+          <p class="text-3xl font-semibold text-violet-400" id="totalBugs">0</p>
+          <p class="font-mono text-[10px] uppercase tracking-wider text-zinc-500 mt-1">Bugs</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div>
+          <label class="block font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Tester</label>
+          <input type="text" id="testerName" placeholder="Nombre del tester" class="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-200">
+        </div>
+        <div>
+          <label class="block font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Canal usado</label>
+          <select id="testChannel" class="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-200">
+            <option value="livechat">Live Chat preview (GHL)</option>
+            <option value="whatsapp">WhatsApp testing</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <label class="block font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Decisión final</label>
+        <div class="space-y-2" id="decisionGroup">
+          <label class="check-item">
+            <input type="radio" name="decision" value="approved" class="!appearance-auto !w-auto !h-auto" data-key="dec-approved">
+            <span class="check-label"><strong class="text-emerald-400">APROBADO</strong> — los 3 bots pueden salir a tráfico real</span>
+          </label>
+          <label class="check-item">
+            <input type="radio" name="decision" value="conditional" class="!appearance-auto !w-auto !h-auto" data-key="dec-conditional">
+            <span class="check-label"><strong class="text-amber-400">APROBADO CON OBSERVACIONES</strong> — sale, hay bugs media a iterar en piloto</span>
+          </label>
+          <label class="check-item">
+            <input type="radio" name="decision" value="rejected" class="!appearance-auto !w-auto !h-auto" data-key="dec-rejected">
+            <span class="check-label"><strong class="text-red-400">NO APROBADO</strong> — bugs alta severidad, no exponer a leads reales</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <label class="block font-mono text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Comentarios libres del tester</label>
+        <textarea id="testerComments" rows="4" placeholder="Notas, observaciones, contexto del piloto..." class="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-200 font-mono"></textarea>
+      </div>
+
+      <div class="mt-6 flex gap-3 no-print">
+        <button onclick="exportResults()" class="btn btn-primary">📥 Exportar resultados (JSON)</button>
+        <button onclick="window.print()" class="btn btn-reset">🖨️ Imprimir</button>
+        <button onclick="resetAll()" class="btn btn-reset">🔄 Reset todo</button>
+      </div>
+    </section>
+
+    <footer class="mt-16 pt-8 border-t border-white/5 text-center">
+      <p class="text-xs text-zinc-600 font-mono">Test Plan v1.0 · sin Bot Compra · Propiedades Ecuador · 2026-05-06</p>
+      <p class="text-xs text-zinc-700 mt-2">Tu progreso queda guardado en este navegador. Para sincronizar entre dispositivos, exportá el JSON.</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const STORAGE_KEY = 'pe-test-bots-sin-compra-v1';
+  const TOTAL_CASES = 11; // 6 + 5 edge
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+  }
+  function saveState(state) { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  let state = loadState();
+  if (!state.checks) state.checks = {};
+  if (!state.cases) state.cases = {};
+  if (!state.bugs) state.bugs = [];
+  if (!state.meta) state.meta = {};
+
+  function bindCheckboxes() {
+    document.querySelectorAll('input[type="checkbox"][data-key], input[type="radio"][data-key]').forEach(cb => {
+      const key = cb.dataset.key;
+      if (cb.type === 'radio') {
+        if (state.checks[cb.name] === cb.value) cb.checked = true;
+        cb.addEventListener('change', () => { state.checks[cb.name] = cb.value; saveState(state); updateProgress(); });
+      } else {
+        if (state.checks[key]) cb.checked = true;
+        cb.addEventListener('change', () => { state.checks[key] = cb.checked; saveState(state); updateProgress(); });
+      }
+    });
+  }
+
+  function markCase(caseId, status) {
+    state.cases[caseId] = status;
+    saveState(state);
+    applyCaseStatus(caseId);
+    updateProgress();
+  }
+
+  function applyCaseStatus(caseId) {
+    const card = document.querySelector(`[data-case="${caseId}"]`);
+    const pill = document.getElementById(`status-${caseId}`);
+    const tocLink = document.querySelector(`[data-case-toc="${caseId}"]`);
+    const status = state.cases[caseId] || 'pending';
+    if (card) card.dataset.status = status;
+    if (pill) {
+      pill.className = 'status-pill status-' + status;
+      pill.textContent = status === 'passed' ? '✓ Pasado' : status === 'failed' ? '✗ Fallido' : 'Pendiente';
+    }
+    if (tocLink) {
+      tocLink.classList.remove('passed', 'failed');
+      if (status === 'passed') tocLink.classList.add('passed');
+      if (status === 'failed') tocLink.classList.add('failed');
+    }
+  }
+
+  function applyAllStatuses() {
+    document.querySelectorAll('[data-case]').forEach(card => { applyCaseStatus(card.dataset.case); });
+  }
+
+  function updateProgress() {
+    const allCases = ['1','2','3','4','5','6','ec1','ec2','ec3','ec4','ec5'];
+    const passed = allCases.filter(c => state.cases[c] === 'passed').length;
+    const failed = allCases.filter(c => state.cases[c] === 'failed').length;
+    const completed = passed + failed;
+    const pending = TOTAL_CASES - completed;
+
+    document.getElementById('progressNum').textContent = `${completed}/${TOTAL_CASES}`;
+    document.getElementById('totalPassed').textContent = passed;
+    document.getElementById('totalFailed').textContent = failed;
+    document.getElementById('totalPending').textContent = pending;
+    document.getElementById('totalBugs').textContent = state.bugs.length;
+
+    const circle = document.getElementById('progressCircle');
+    const circumference = 2 * Math.PI * 20;
+    const offset = circumference - (completed / TOTAL_CASES) * circumference;
+    circle.style.strokeDashoffset = offset;
+
+    if (failed > 0) circle.style.stroke = '#F87171';
+    else if (completed === TOTAL_CASES) circle.style.stroke = '#4ADE80';
+    else circle.style.stroke = '#8B5CF6';
+  }
+
+  function filterCases(filter) {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    const activePill = document.querySelector(`[data-filter="${filter}"]`);
+    if (activePill) activePill.classList.add('active');
+
+    document.querySelectorAll('[data-case]').forEach(card => {
+      const status = state.cases[card.dataset.case] || 'pending';
+      const bot = card.dataset.bot;
+      let show = true;
+      if (filter === 'pending' && status !== 'pending') show = false;
+      else if (filter === 'passed' && status !== 'passed') show = false;
+      else if (filter === 'failed' && status !== 'failed') show = false;
+      else if (['captacion','alianza','requerimiento'].includes(filter) && bot !== filter) show = false;
+      card.dataset.hidden = show ? 'false' : 'true';
+    });
+  }
+
+  function renderBugs() {
+    const container = document.getElementById('bugList');
+    container.innerHTML = '';
+    state.bugs.forEach((bug, idx) => {
+      const row = document.createElement('div');
+      row.className = 'bug-row';
+      row.innerHTML = `
+        <div class="font-mono text-zinc-500 pt-2">${idx + 1}</div>
+        <textarea data-bug-idx="${idx}" data-bug-field="what" placeholder="Caso X · qué pasó">${bug.what || ''}</textarea>
+        <textarea data-bug-idx="${idx}" data-bug-field="expected" placeholder="Qué esperabas">${bug.expected || ''}</textarea>
+        <select data-bug-idx="${idx}" data-bug-field="severity">
+          <option value="alta" ${bug.severity === 'alta' ? 'selected' : ''}>🔴 Alta</option>
+          <option value="media" ${bug.severity === 'media' ? 'selected' : ''}>🟡 Media</option>
+          <option value="baja" ${bug.severity === 'baja' ? 'selected' : ''}>⚪ Baja</option>
+        </select>
+        <select data-bug-idx="${idx}" data-bug-field="bot">
+          <option value="" ${!bug.bot ? 'selected' : ''}>—</option>
+          <option value="captacion" ${bug.bot === 'captacion' ? 'selected' : ''}>🟫 Captación</option>
+          <option value="alianza" ${bug.bot === 'alianza' ? 'selected' : ''}>🟨 Alianza</option>
+          <option value="requerimiento" ${bug.bot === 'requerimiento' ? 'selected' : ''}>🟪 Requerimiento</option>
+          <option value="orquestador" ${bug.bot === 'orquestador' ? 'selected' : ''}>🟣 Orquestador</option>
+        </select>
+        <button class="delete-btn" onclick="deleteBug(${idx})" title="Eliminar bug">×</button>
+      `;
+      container.appendChild(row);
+    });
+
+    container.querySelectorAll('[data-bug-idx]').forEach(el => {
+      el.addEventListener('input', () => {
+        const idx = parseInt(el.dataset.bugIdx);
+        state.bugs[idx][el.dataset.bugField] = el.value;
+        saveState(state);
+      });
+      el.addEventListener('change', () => {
+        const idx = parseInt(el.dataset.bugIdx);
+        state.bugs[idx][el.dataset.bugField] = el.value;
+        saveState(state);
+      });
+    });
+  }
+
+  function addBug() {
+    state.bugs.push({ what: '', expected: '', severity: 'media', bot: '' });
+    saveState(state);
+    renderBugs();
+    updateProgress();
+  }
+
+  function deleteBug(idx) {
+    state.bugs.splice(idx, 1);
+    saveState(state);
+    renderBugs();
+    updateProgress();
+  }
+
+  function bindMetaFields() {
+    ['testerName', 'testChannel', 'testerComments'].forEach(id => {
+      const el = document.getElementById(id);
+      if (state.meta[id]) el.value = state.meta[id];
+      el.addEventListener('input', () => { state.meta[id] = el.value; saveState(state); });
+      el.addEventListener('change', () => { state.meta[id] = el.value; saveState(state); });
+    });
+  }
+
+  function resetAll() {
+    if (!confirm('Esto borra TODO el progreso (checkboxes, casos, bugs, comentarios). ¿Seguro?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = { checks: {}, cases: {}, bugs: [], meta: {} };
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('input[type="radio"]').forEach(cb => cb.checked = false);
+    document.getElementById('testerName').value = '';
+    document.getElementById('testerComments').value = '';
+    document.getElementById('testChannel').value = 'livechat';
+    applyAllStatuses();
+    renderBugs();
+    updateProgress();
+  }
+
+  function exportResults() {
+    const allCases = ['1','2','3','4','5','6','ec1','ec2','ec3','ec4','ec5'];
+    const result = {
+      timestamp: new Date().toISOString(),
+      version: 'sin-compra-v1',
+      tester: state.meta.testerName || '',
+      channel: state.meta.testChannel || '',
+      comments: state.meta.testerComments || '',
+      decision: state.checks.decision || '',
+      summary: {
+        total: TOTAL_CASES,
+        passed: allCases.filter(c => state.cases[c] === 'passed').length,
+        failed: allCases.filter(c => state.cases[c] === 'failed').length,
+        pending: allCases.filter(c => !state.cases[c] || state.cases[c] === 'pending').length,
+      },
+      cases: state.cases,
+      checks: state.checks,
+      bugs: state.bugs,
+    };
+    const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `test-bots-pe-sin-compra-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    bindCheckboxes();
+    bindMetaFields();
+    applyAllStatuses();
+    renderBugs();
+    updateProgress();
+  });
+</script>
+
+</body>
+</html>
