@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Casos de prueba · Bots Propiedades Ecuador</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
@@ -102,6 +103,19 @@
     .status-passed { background: rgba(74, 222, 128, 0.18); color: #86EFAC; }
     .status-failed { background: rgba(248, 113, 113, 0.18); color: #FCA5A5; }
 
+    /* Sync badge — estado de conexion Supabase */
+    .sync-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.02em; transition: all 0.25s ease; width: 100%; justify-content: center; }
+    .sync-status.sync-syncing { background: rgba(139,92,246,0.12); color: #C4B5FD; border: 1px solid rgba(139,92,246,0.3); }
+    .sync-status.sync-online  { background: rgba(74,222,128,0.10); color: #86EFAC; border: 1px solid rgba(74,222,128,0.28); }
+    .sync-status.sync-offline { background: rgba(251,191,36,0.10); color: #FDE68A; border: 1px solid rgba(251,191,36,0.30); }
+    .sync-status.sync-error   { background: rgba(248,113,113,0.10); color: #FCA5A5; border: 1px solid rgba(248,113,113,0.30); }
+    .sync-status .sync-dot { width: 6px; height: 6px; border-radius: 999px; display: inline-block; flex-shrink: 0; }
+    .sync-syncing .sync-dot { background: #8B5CF6; animation: syncPulse 1.2s ease-in-out infinite; }
+    .sync-online  .sync-dot { background: #4ADE80; }
+    .sync-offline .sync-dot { background: #FBBF24; }
+    .sync-error   .sync-dot { background: #F87171; }
+    @keyframes syncPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+
     /* Lateral note */
     .note-lateral { background: rgba(99, 102, 241, 0.06); border-left: 3px solid rgba(139, 92, 246, 0.5); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 16px; font-size: 13px; color: #C7D2FE; }
     .note-lateral strong { color: #DDD6FE; }
@@ -197,6 +211,7 @@
     </div>
 
     <div class="pt-4 border-t border-white/[0.06] space-y-2">
+      <span id="syncStatus" class="sync-status sync-syncing"><span class="sync-dot"></span><span id="syncStatusText">Conectando…</span></span>
       <button onclick="resetAll()" class="btn btn-reset w-full">Reset progreso</button>
       <button onclick="exportResults()" class="btn btn-primary w-full">Exportar resultados</button>
     </div>
@@ -1008,7 +1023,7 @@
 
     <footer class="mt-16 pt-8 border-t border-white/5 text-center">
       <p class="text-xs text-zinc-600 font-mono">Test Plan v1.0 · Propiedades Ecuador · 2026-05-06</p>
-      <p class="text-xs text-zinc-700 mt-2">Tu progreso queda guardado en este navegador. Para sincronizar entre dispositivos, exportá el JSON.</p>
+      <p class="text-xs text-zinc-700 mt-2">Progreso sincronizado en vivo entre todos los testers vía Supabase. localStorage queda como cache offline. Para snapshot fuera de línea, usá "Exportar resultados".</p>
     </footer>
 
   </main>
@@ -1016,10 +1031,13 @@
 
 <script>
   // ═══════════════════════════════════════════════════════════════════════════
-  // STATE & PERSISTENCE
+  // STATE & PERSISTENCE (Supabase sync + localStorage cache)
   // ═══════════════════════════════════════════════════════════════════════════
   const STORAGE_KEY = 'pe-test-bots-v1';
   const TOTAL_CASES = 13; // 8 + 5 edge
+  const PLAN_KEY = 'propiedades-ecuador-bots';
+  const SUPABASE_URL = 'https://clvsnjcbdxlwsuivanvl.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_WTKGm9nhW-YYqXlUfQFWdg_0LTRPRCi';
 
   function loadState() {
     try {
@@ -1027,8 +1045,9 @@
     } catch { return {}; }
   }
 
-  function saveState(state) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  function saveState(stateObj, { pushRemote = true } = {}) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateObj));
+    if (pushRemote && sb && !suppressPush) schedulePush();
   }
 
   let state = loadState();
@@ -1036,6 +1055,128 @@
   if (!state.cases) state.cases = {};
   if (!state.bugs) state.bugs = [];
   if (!state.meta) state.meta = {};
+
+  // === Supabase client ===
+  const sb = (window.supabase && window.supabase.createClient)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { realtime: { params: { eventsPerSecond: 5 } } })
+    : null;
+
+  let lastRemoteMeta = { by: '', at: '' };
+  let suppressPush = false;
+  let pushTimer = null;
+
+  function getTesterName() {
+    return (state.meta.testerName || '').trim() || 'anónimo';
+  }
+
+  function setSyncStatus(s, text) {
+    const wrap = document.getElementById('syncStatus');
+    const txt = document.getElementById('syncStatusText');
+    if (!wrap || !txt) return;
+    wrap.className = 'sync-status sync-' + s;
+    txt.textContent = text;
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const s = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+    if (s < 60) return `hace ${s}s`;
+    if (s < 3600) return `hace ${Math.floor(s/60)}m`;
+    if (s < 86400) return `hace ${Math.floor(s/3600)}h`;
+    return `hace ${Math.floor(s/86400)}d`;
+  }
+
+  function schedulePush() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushState, 350);
+  }
+
+  async function pushState() {
+    if (!sb) return;
+    setSyncStatus('syncing', 'Guardando…');
+    const { error } = await sb
+      .from('test_plan_state')
+      .upsert({ plan_key: PLAN_KEY, state: state, updated_by: getTesterName() }, { onConflict: 'plan_key' });
+    if (error) {
+      console.warn('[sync] push failed:', error);
+      setSyncStatus('error', 'Error · cache local OK');
+      return;
+    }
+    lastRemoteMeta = { by: getTesterName(), at: new Date().toISOString() };
+    setSyncStatus('online', `Guardado · ${getTesterName()}`);
+  }
+
+  async function pullState() {
+    if (!sb) { setSyncStatus('offline', 'Sin sync · cache local'); return; }
+    setSyncStatus('syncing', 'Conectando…');
+    const { data, error } = await sb
+      .from('test_plan_state')
+      .select('state, updated_at, updated_by')
+      .eq('plan_key', PLAN_KEY)
+      .maybeSingle();
+    if (error) {
+      console.warn('[sync] pull failed:', error);
+      setSyncStatus('offline', 'Offline · cache local');
+      return;
+    }
+    if (data && data.state) {
+      state = {
+        checks: data.state.checks || {},
+        cases: data.state.cases || {},
+        bugs: data.state.bugs || [],
+        meta: data.state.meta || {}
+      };
+      lastRemoteMeta = { by: data.updated_by || '', at: data.updated_at || '' };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      applyAllToUI();
+      setSyncStatus('online', `Sync · ${data.updated_by || 'remoto'} ${timeAgo(data.updated_at)}`);
+    } else {
+      await pushState(); // Seed inicial con lo que haya en localStorage
+    }
+  }
+
+  function subscribeRealtime() {
+    if (!sb) return;
+    sb.channel(`tps-${PLAN_KEY}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'test_plan_state',
+        filter: `plan_key=eq.${PLAN_KEY}`,
+      }, (payload) => {
+        const row = payload.new || payload.old;
+        if (!row || !row.state) return;
+        if (row.updated_by === getTesterName() && lastRemoteMeta.at &&
+            Math.abs(new Date(row.updated_at) - new Date(lastRemoteMeta.at)) < 1500) return;
+        suppressPush = true;
+        state = {
+          checks: row.state.checks || {},
+          cases: row.state.cases || {},
+          bugs: row.state.bugs || [],
+          meta: row.state.meta || {}
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        applyAllToUI();
+        lastRemoteMeta = { by: row.updated_by || '', at: row.updated_at || '' };
+        setSyncStatus('online', `Actualizado por ${row.updated_by || 'remoto'} ${timeAgo(row.updated_at)}`);
+        setTimeout(() => { suppressPush = false; }, 50);
+      })
+      .subscribe();
+  }
+
+  function applyAllToUI() {
+    document.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+      cb.checked = !!state.checks[cb.dataset.key];
+    });
+    document.querySelectorAll('input[type="radio"][data-key]').forEach(rb => {
+      rb.checked = state.checks[rb.name] === rb.value;
+    });
+    ['testerName', 'testChannel', 'testerComments'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = state.meta[id] || (id === 'testChannel' ? 'livechat' : '');
+    });
+    applyAllStatuses();
+    renderBugs();
+    updateProgress();
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CHECKBOX PERSISTENCE
@@ -1228,8 +1369,7 @@
   // RESET & EXPORT
   // ═══════════════════════════════════════════════════════════════════════════
   function resetAll() {
-    if (!confirm('Esto borra TODO el progreso (checkboxes, casos, bugs, comentarios). ¿Seguro?')) return;
-    localStorage.removeItem(STORAGE_KEY);
+    if (!confirm('Esto borra TODO el progreso (checkboxes, casos, bugs, comentarios).\nSe sincroniza con todos los testers. El estado anterior queda en el history de Supabase por si hay que restaurarlo. ¿Seguro?')) return;
     state = { checks: {}, cases: {}, bugs: [], meta: {} };
     document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('input[type="radio"]').forEach(cb => cb.checked = false);
@@ -1239,6 +1379,7 @@
     applyAllStatuses();
     renderBugs();
     updateProgress();
+    saveState(state);
   }
 
   function exportResults() {
@@ -1277,6 +1418,14 @@
     applyAllStatuses();
     renderBugs();
     updateProgress();
+    pullState().then(subscribeRealtime);
+
+    // Refresca el "hace Xs" cada 30s
+    setInterval(() => {
+      if (lastRemoteMeta.at && document.getElementById('syncStatus')?.classList.contains('sync-online')) {
+        setSyncStatus('online', `Sync · ${lastRemoteMeta.by || 'remoto'} ${timeAgo(lastRemoteMeta.at)}`);
+      }
+    }, 30000);
   });
 </script>
 
